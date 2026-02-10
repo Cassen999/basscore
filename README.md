@@ -1,2 +1,3 @@
-# basscore
-Knowledge-base and practice helper for all things bass 
+# Basscore
+
+Basscore is a general database and practice helper for bass guitar
