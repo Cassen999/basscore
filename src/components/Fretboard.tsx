@@ -1,29 +1,21 @@
 import type { iFretboardProps } from "../types/types";
+import {
+  fretboardHeight,
+  fretboardWidth,
+  numFrets,
+  getX,
+  getY,
+  numStrings,
+  mapFretPoints,
+} from "../helpers/fretboardHelpers";
 
-const Fretboard = (props: iFretboardProps) => {
-  const { coords } = props;
-  const width = 500;
-  const height = 200;
-  const circleRadius = 8;
-  const maxStroke = 3;
-  const margin = circleRadius + maxStroke / 2 + 2;
-
-  const numFrets = 5;
-  const numStrings = 4;
-
-  const getY = (stringIndex: number) =>
-    margin + (numStrings - stringIndex) * ((height - 2 * margin) / numFrets);
-
-  const getX = (fretIndex: number) =>
-    margin + fretIndex * ((width - 2 * margin) / numFrets);
-
-  const getCircleX = (fretIndex: number) =>
-    (getX(fretIndex - 1) + getX(fretIndex)) / 2;
-
-  const getCircleY = (stringIndex: number) => getY(stringIndex);
-
+const Fretboard = (props?: iFretboardProps) => {
   return (
-    <svg width={width} height={height} style={{ background: "white" }}>
+    <svg
+      width={fretboardWidth}
+      height={fretboardHeight}
+      style={{ background: "white" }}
+    >
       {/* Fret Lines */}
       {Array.from({ length: numFrets + 1 }).map((_, i) => (
         <line
@@ -50,10 +42,8 @@ const Fretboard = (props: iFretboardProps) => {
         />
       ))}
 
-      {coords.map((coord) => {
-        const { string, fret } = coord;
-        return fret !== 0 && <circle cx={getCircleX(fret)} cy={getCircleY(string)} r={8} fill="orange" />;
-      })}
+      {/** If coordinates are given map the fret points */}
+      {props?.coords && mapFretPoints(props.coords)}
     </svg>
   );
 };

@@ -5,7 +5,11 @@ export interface iCoords {
 }
 
 export interface iFretboardProps {
-  coords: iCoords[];
+  coords?: iCoords[];
+  /** @default 500 Width of fretboard in px */
+  width?: number;
+  /** @default 200 Height of fretboard in px */
+  height?: number;
 }
 
 export interface iConvertInterval {
