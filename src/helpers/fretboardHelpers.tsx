@@ -20,7 +20,7 @@ export const mapFretPoints = (coords: iCoords[], numFrets: number, numStrings: n
 
   const getCircleY = (stringIndex: number) => getY(stringIndex, numFrets, numStrings);
 
-  return coords.map((coord) => {
+  return coords.map((coord, i) => {
     const { string, fret, root = false, unison = false } = coord;
     const dotColor = () => {
       if (root) return 'pink';
@@ -29,6 +29,7 @@ export const mapFretPoints = (coords: iCoords[], numFrets: number, numStrings: n
     };
     return (
       <circle
+        key={`fretpoint-${i}`}
         cx={getCircleX(fret)}
         cy={getCircleY(string)}
         r={8}
