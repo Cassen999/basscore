@@ -4,11 +4,12 @@
 - Audio recognition
 - Metronome
 - Tuner
+- Scale visual
+- Interval visual
 
 # Flash cards
 
 - Card
-- Interval visual
 - Audio recognition (later)
 - Flip animation
 
@@ -18,3 +19,6 @@
   - Draw a circle at correct coordinate based on interval
 - Dot with dynamic number
   - Could be dynamic or could be a collection of dots 1-7
+
+
+Make root note in createInterval optional
