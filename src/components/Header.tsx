@@ -9,8 +9,15 @@ export const Header = () => {
   const items: MenuItem[] = [
     {
       label: "Home",
-      icon: <img src={Initials} className="initials" />,
       command: () => nav("/"),
+    },
+    {
+      label: "Scales",
+      command: () => nav("/scales"),
+    },
+    {
+      label: "Intervals",
+      command: () => nav("/intervals"),
     },
   ];
 
@@ -19,7 +26,11 @@ export const Header = () => {
       <div className="logo-container">
         <img src={Logo} className="logo" alt="basscore logo" />
       </div>
-      <Menubar className="home-menu" model={items} />
+      <Menubar
+        className="home-menu"
+        model={items}
+        start={<img src={Initials} className="initials" />}
+      />
     </div>
   );
 };
