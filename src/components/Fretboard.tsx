@@ -14,17 +14,16 @@ const Fretboard = (props?: iFretboardProps) => {
     <svg
       width={fretboardWidth}
       height={fretboardHeight}
-      style={{ background: "white" }}
     >
       {/* Fret Lines */}
       {Array.from({ length: numFrets + 1 }).map((_, i) => (
         <line
+          className='fret-lines'
           key={`fret-${i}`}
           x1={getX(i, numFrets)}
           y1={getY(1, numFrets, numStrings)}
           x2={getX(i, numFrets)}
           y2={getY(numStrings, numFrets, numStrings)}
-          stroke="#888"
           strokeWidth={2}
         />
       ))}
@@ -37,7 +36,7 @@ const Fretboard = (props?: iFretboardProps) => {
           y1={getY(i + 1, numFrets, numStrings)}
           x2={getX(numFrets, numFrets)}
           y2={getY(i + 1, numFrets, numStrings)}
-          stroke="#ccc"
+          className='string-lines'
           strokeWidth={3 - i * 0.5}
         />
       ))}

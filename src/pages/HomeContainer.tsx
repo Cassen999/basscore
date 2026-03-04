@@ -3,14 +3,11 @@ import { Header } from "../components/Header";
 
 export const HomeContainer = () => {
   return (
-    <div className='home-container'>
+    <div className="app-container">
       <Header />
-      <div className='main-section'>
-        {/* <Sidenav /> */}
-        <main>
-          <Outlet />
-        </main>
-      </div>
+      <main className="main-section">
+        <Outlet />
+      </main>
     </div>
   );
-}
+};
