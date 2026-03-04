@@ -6,10 +6,17 @@ import {
   getY,
   mapFretPoints,
 } from "../helpers/fretboardHelpers";
+import { useMemo } from "react";
 
 const Fretboard = (props?: iFretboardProps) => {
   const numFrets = props?.numFrets ?? 5;
   const numStrings = props?.numStrings ?? 4;
+
+  const fretPoints = useMemo(() => {
+    if (!props?.coords) return [];
+    return mapFretPoints(props.coords, numFrets,  numStrings)
+  }, [props?.coords, numFrets, numStrings]);
+  
   return (
     <svg
       width={fretboardWidth}
@@ -42,7 +49,7 @@ const Fretboard = (props?: iFretboardProps) => {
       ))}
 
       {/** If coordinates are given map the fret points */}
-      {props?.coords && mapFretPoints(props.coords, numFrets, numStrings)}
+      {fretPoints}
     </svg>
   );
 };

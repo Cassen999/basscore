@@ -1,15 +1,17 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react"
-import type { iControlsContext } from "../types/types";
+import type { iControlsContext, tInterval } from "../types/types";
 
 const ControlsContext = createContext<iControlsContext | null>(null);
 
 export const ControlsProvider = ({ children }: { children: ReactNode }) => {
-  const [interval, setInterval] = useState<number | number[]>(2);
+  const [interval, setInterval] = useState<tInterval>(2);
 
   const value = useMemo((): iControlsContext => ({
+    interval: interval,
+    setInterval: setInterval,
+  }), [
     interval,
-    setInterval,
-  }), [interval]);
+  ]);
 
   return (
     <ControlsContext.Provider value={value}>

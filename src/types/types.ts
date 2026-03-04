@@ -47,9 +47,10 @@ export interface iScaleString {
 }
 
 export type tCreateScale = 'major' | 'dorian' | 'phrygian' | 'lydian' | 'mixolydian' | 'minor' | 'locrian'; 
+export type tInterval = 2 | 3 | 4 | 5 | 6 | 7 | 8
 
 export interface iCreateInterval {
-  interval: 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  interval: tInterval;
   /** @default false */
   flat?: boolean;
   /** @default true If true, will show the interval note's unison note */
@@ -57,6 +58,7 @@ export interface iCreateInterval {
 }
 
 export interface iControlsContext {
-  interval?: number | number[];
-  setInterval?: Dispatch<SetStateAction<number | number[]>>,
+  /** @default 2 */
+  interval?: tInterval;
+  setInterval?: Dispatch<SetStateAction<tInterval>>,
 }
