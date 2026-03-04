@@ -2,6 +2,8 @@
 @use "primereact/resources/themes/lara-dark-purple/theme.css";
 @use './root.scss';
 @use './homepage.scss';
+@use './fretboard.scss';
+@use './intervals.scss';
 
 @font-face {
   font-family: 'SpaceGrotesk';

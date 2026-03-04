@@ -5,60 +5,68 @@ export const createInterval = ({
   flat = false,
   unison = true,
 }: iCreateInterval): iCoords[] => {
-  const root: iCoords = {
-    fret: 5,
-    string: 1,
-    root: true,
+  const rootPosition = (() => {
+    switch (interval) {
+      case 2:
+        return flat ? 5 : 4;
+      case 3:
+        return flat ? 3 : 2;
+      case 4:
+        return 1;
+      case 5:
+        return flat ? 5 : 4;
+      case 6:
+        return flat ? 3 : 2;
+      case 7:
+        return flat ? 1 : 5;
+      case 8:
+        return 4;
+      default:
+        return 5;
+    }
+  })();
+
+  const intervalString = (position: number, flat?: boolean): number => {
+    switch (position) {
+      case 2:
+      case 3:
+      case 4:
+        return 1;
+      case 5:
+      case 6:
+        return 2
+      case 7:
+        return flat ? 2 : 3;
+      case 8:
+        return 3;
+      default:
+        return 1;
+    }
   };
 
-  const intervalNote: iCoords = {
-    fret: 6,
-    string: 1,
+  const unisonString = (position: number, flat?: boolean) => {
+    switch (position) {
+      case 2:
+      case 3:
+      case 4:
+        return 2;
+      case 5:
+      case 6:
+        return 3;
+      case 7:
+        return flat ? 3 : 4
+      case 8:
+        return 4;
+      default:
+        return 2;
+    }
   };
 
-  const unisonNote: iCoords = {
-    fret: 1,
-    string: 2,
-    unison: true,
-  };
+  const root: iCoords = { fret: rootPosition, string: 1, root: true };
+  const intervalNote: iCoords = { fret: 6, string: intervalString(interval, flat) };
+  const unisonNote: iCoords | undefined = unison
+    ? { fret: 1, string: unisonString(interval, flat), unison: true }
+    : undefined;
 
-  switch (interval) {
-    case 2:
-      root.fret = flat ? 5 : 4;
-      break;
-
-    case 3:
-      root.fret = flat ? 3 : 4;
-      break;
-
-    case 4:
-      root.fret = 1;
-      break;
-
-    case 5:
-      root.fret = flat ? 5 : 4;
-      intervalNote.string = 2;
-      if (unison) unisonNote.string = 3;
-      break;
-
-    case 6:
-      root.fret = flat ? 3 : 2;
-      intervalNote.string = 2;
-      if (unison) unisonNote.string = 3;
-      break;
-
-    case 7:
-      root.fret = flat ? 1 : 5;
-      intervalNote.string = flat ? 2 : 3;
-      if (unison) unisonNote.string = flat ? 3 : 4;
-      break;
-
-    case 8:
-      root.fret = 4;
-      intervalNote.string = 3;
-      if (unison) unisonNote.string = 4;
-      break;
-  }
-
-  return [root, intervalNote, ...(unison ? [unisonNote] : [])];
+  return [root, intervalNote, ...(unisonNote ? [unisonNote] : [])];
 };

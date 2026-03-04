@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 export interface iCoords {
   string: number;
   fret: number;
@@ -45,11 +47,18 @@ export interface iScaleString {
 }
 
 export type tCreateScale = 'major' | 'dorian' | 'phrygian' | 'lydian' | 'mixolydian' | 'minor' | 'locrian'; 
+export type tInterval = 2 | 3 | 4 | 5 | 6 | 7 | 8
 
 export interface iCreateInterval {
-  interval: 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  interval: tInterval;
   /** @default false */
   flat?: boolean;
   /** @default true If true, will show the interval note's unison note */
   unison?: boolean;
+}
+
+export interface iControlsContext {
+  /** @default 2 */
+  interval?: tInterval;
+  setInterval?: Dispatch<SetStateAction<tInterval>>,
 }
