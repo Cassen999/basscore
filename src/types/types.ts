@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 export interface iCoords {
   string: number;
   fret: number;
@@ -52,4 +54,9 @@ export interface iCreateInterval {
   flat?: boolean;
   /** @default true If true, will show the interval note's unison note */
   unison?: boolean;
+}
+
+export interface iControlsContext {
+  interval?: number | number[];
+  setInterval?: Dispatch<SetStateAction<number | number[]>>,
 }

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import Fretboard from "../components/Fretboard";
 import { createInterval } from "../helpers/createInterval";
 
 export const Intervals = () => {
+  const [interval, setInterval] = useState<number | number[]>(2);
   return (
     <div className="intervals-container">
       <h1 className="page-title">Intervals</h1>
@@ -14,7 +16,7 @@ export const Intervals = () => {
           Flat: <Fretboard coords={createInterval({ interval: 2, flat: true })} numFrets={6} />
         </div>
 
-        <div className="page-subsection">
+        {/* <div className="page-subsection">
           <h2>3rd</h2>
           <Fretboard coords={createInterval({ interval: 3 })} numFrets={6} />
           Flat: <Fretboard coords={createInterval({ interval: 3, flat: true })} numFrets={6} />
@@ -46,7 +48,7 @@ export const Intervals = () => {
         <div className="page-subsection">
           <h2>8th (Octave)</h2>
           <Fretboard coords={createInterval({ interval: 8 })} numFrets={6} />
-        </div>
+        </div> */}
       </div>
     </div>
   );
