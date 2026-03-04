@@ -9,6 +9,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomeContainer />}>
+        <Route index path="home" element={<Home />} />
         <Route path="scales" element={<Scales />} />
         <Route path="intervals" element={<Intervals />} />
       </Route>
