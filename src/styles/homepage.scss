@@ -24,3 +24,24 @@
 .p-menubar-start {
   height: 50px;
 }
+
+.main-section {
+  display: flex;
+  width: 100%;
+}
+
+.nav-menu-container {
+  width: 15vw;
+  height: 100vw;
+}
+
+.home-container {
+  padding: 2rem;
+}
+
+.scales-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
