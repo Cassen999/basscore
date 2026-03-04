@@ -69,9 +69,14 @@
 .p-menubar {
   background: $overlays;
   border: $overlays;
-  .p-menuitem:hover {
-    background-color: $overlay-hover;
-    border-radius: 4px;
+  .p-menuitem {
+    :hover {
+      background-color: $overlay-hover;
+      border-radius: 4px;
+    }
+    &.p-focus .p-menuitem-content {
+      background-color: $overlay-hover
+    }
   }
 }
 
