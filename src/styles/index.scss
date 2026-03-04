@@ -1,10 +1,11 @@
+@use './variables.scss';
 @use "primereact/resources/themes/lara-dark-purple/theme.css";
 @use './root.scss';
 @use './homepage.scss';
 
 @font-face {
-  font-family: 'NotoSans';
-  src: url('../../fonts/font.ttf') format('truetype');
+  font-family: 'SpaceGrotesk';
+  src: url('../../fonts/SpaceGrotesk.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

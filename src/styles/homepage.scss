@@ -1,26 +1,84 @@
-.header-container {
+@use 'sass:map';
+@use "./variables.scss" as *;
+
+.app-container {
+  overflow: hidden;
+  height: 100vh;
   display: flex;
-  align-content: center;
   flex-direction: column;
-}
-
-.logo-container {
-  display: flex;
-  justify-content: center;
-  .logo {
-    width: 500px;
+  .header-container {
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    padding: 2rem;
   }
-}
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    .logo {
+      width: 500px;
+    }
+  }
 
-.home-menu {
-  height: 100px;
-  width: 100%;
-  .initials {
+  .home-menu {
+    height: 100px;
+    width: 100%;
+    .initials {
+      height: 50px;
+      width: 50px;
+    }
+  }
+
+  .p-menubar-start {
     height: 50px;
-    width: 50px;
+  }
+
+  .nav-menu-container {
+    width: 15vw;
+    height: 100vw;
+  }
+
+  .main-section {
+    display: flex;
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    padding: 0 3rem 0;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: map-get($colors, 'gray300');
+      border-radius: 8px;
+    }
   }
 }
 
-.p-menubar-start {
-  height: 50px;
+.scales-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.p-menubar {
+  background: $overlays;
+  border: $overlays;
+  .p-menuitem:hover {
+    background-color: $overlay-hover;
+    border-radius: 4px;
+  }
+}
+
+.fret-lines {
+  stroke: white;
+}
+
+.string-lines {
+  stroke: white;
 }

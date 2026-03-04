@@ -1,0 +1,27 @@
+@use 'sass:map';
+
+$colors: (
+  'gray0': #F9F9F9,
+  'gray50': #EBEBEB,
+  'gray100': #D7D7D7,
+  'gray200': #AFAFAF,
+  'gray300': #868686,
+  'gray400': #5E5E5E,
+  'gray600': #2B2B2B,
+  'gray700': #202020,
+  'gray750': #181818,
+  'gray800': #161616,
+  'gray850': #101010,
+  'gray900': #0B0B0B,
+);
+
+// text
+$primary-text: map-get($colors, 'gray0');
+$secondary-text: map-get($colors, 'gray200');
+
+// backgrounds
+$background: map-get($colors, 'gray700');
+$overlays: map-get($colors, 'gray850');
+
+// hovers
+$overlay-hover: map-get($colors, 'gray600');

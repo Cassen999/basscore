@@ -6,7 +6,7 @@ export const Scales = () => {
     <div className="scales-container">
       <h1 className="page-title">Scales and Positions</h1>
 
-      <div className="page-section">
+      {/* <div className="page-section">
         <h2 className="page-subtitle">Major (Position 1)</h2>
         <Fretboard coords={createScale('major')} />
       </div>
@@ -39,7 +39,7 @@ export const Scales = () => {
       <div className="page-section">
         <h2 className="page-subtitle">Locrian (Position 7)</h2>
         <Fretboard coords={createScale('locrian')} />
-      </div>
+      </div> */}
     </div>
   );
 };
