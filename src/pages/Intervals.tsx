@@ -1,6 +1,5 @@
 import Fretboard from "../components/Fretboard";
 import { createInterval } from "../helpers/createInterval";
-import '../styles/intervals.scss';
 
 export const Intervals = () => {
   return (
