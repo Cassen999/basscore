@@ -1,3 +1,21 @@
+@use './variables.scss' as *;
+
 h1 {
   margin-top: 0px;
+}
+
+.intervals-container {
+  width: 100%;
+  .intervals-page-section {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  
+  .p-card {
+    background: $overlays;
+  }
+
+  .page-subsection {
+    flex: 2 1 auto;
+  }
 }
