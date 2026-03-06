@@ -18,4 +18,15 @@ h1 {
   .page-subsection {
     flex: 2 1 auto;
   }
+
+  .root-controls {
+    display: flex;
+    flex-direction: column-reverse;
+    .color-picker {
+      margin-left: 1rem;
+    }
+    label {
+      margin-bottom: .5rem;
+    }
+  }
 }

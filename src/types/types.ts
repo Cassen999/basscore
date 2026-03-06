@@ -1,12 +1,11 @@
-import type { Dispatch, SetStateAction } from "react";
+import type { CardProps } from "primereact/card";
+import type { ColorPickerChangeEvent } from 'primereact/colorpicker';
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 export interface iCoords {
   string: number;
   fret: number;
-  /** @default false If true, circle will be a different color to denote root note */
-  root?: boolean;
-  /** @default false If true, circle will be a different color to denote a unison note */
-  unison?: boolean;
+  color: tColorType;
 }
 
 export interface iFretboardProps {
@@ -55,10 +54,38 @@ export interface iCreateInterval {
   flat?: boolean;
   /** @default true If true, will show the interval note's unison note */
   unison?: boolean;
+  colors: {
+    root: string,
+    interval: string,
+    unison: string,
+  }
+}
+
+export type tColorType = ColorPickerChangeEvent['value'];
+
+export interface iColor {
+  color: tColorType;
+  setColor: Dispatch<SetStateAction<tColorType>>
+}
+
+/** strings can be colors as css would allow */
+export interface iIntervalColors {
+  /** @default #FFC5D3 for root.color */
+  root: iColor;
+  /** @default #C9A0DC for interval.color */
+  interval: iColor;
+  /** @default #75DAD7 for unison.color */
+  unison: iColor;
 }
 
 export interface iControlsContext {
   /** @default 2 */
-  interval?: tInterval;
-  setInterval?: Dispatch<SetStateAction<tInterval>>,
+  interval: tInterval;
+  intervalColors: iIntervalColors;
+  setInterval: Dispatch<SetStateAction<tInterval>>,
+}
+
+export interface iControlProps {
+  cardProps?: CardProps;
+  elements: ReactNode[];
 }

@@ -1,11 +1,14 @@
-import { Card } from 'primereact/card';
+import { Card } from "primereact/card";
+import type { iControlProps } from "../types/types";
 
-const ControlPanel = () => {
+const ControlPanel = (props: iControlProps) => {
   return (
-    <Card title='Controls'>
-      controls content
+    <Card {...props?.cardProps}>
+      {props.elements.map((el) => {
+        return <div className="control-element">{el}</div>;
+      })}
     </Card>
   );
-}
+};
 
 export default ControlPanel;

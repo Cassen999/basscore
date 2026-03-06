@@ -1,30 +1,56 @@
 import Fretboard from "../components/Fretboard";
 import { createInterval } from "../helpers/createInterval";
 import { useControls } from "../contexts/ControlsContext";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import ControlPanel from "../components/ControlPanel";
+import { ColorPicker } from "primereact/colorpicker";
 
 export const Intervals = () => {
-  const { interval = 2, setInterval } = useControls();
+  const { interval = 2, setInterval, intervalColors } = useControls();
 
-  const intervalSuffix = (interval: number) => {
+
+  const intervalSuffix = (interval: number): string => {
     switch (interval) {
       case 1:
-        return 'st';
+        return "st";
       case 2:
-        return 'nd';
+        return "nd";
       case 3:
-        return 'rd';
+        return "rd";
       default:
-        return 'th';
+        return "th";
     }
-  }
+  };
+
+  const intervalRenderColors = {
+    root: intervalColors?.root.color as string,
+    interval: intervalColors?.interval.color as string,
+    unison: intervalColors?.unison.color as string,
+  };
 
   const coords = useMemo(
-    () => createInterval({ interval: interval }),
-    [interval],
+    () => createInterval({ interval: interval, colors: intervalRenderColors }),
+    [
+      interval,
+      intervalRenderColors
+    ],
   );
-  
+
+  const rootNoteControls = (): ReactNode => {
+    return (
+      <div className="root-controls">
+        <ColorPicker
+          id='root-note-cp'
+          className='color-picker'
+          title="Root Note Color"
+          value={intervalColors?.root.color as string}
+          onChange={(e) => intervalColors?.root.setColor(`#${e.value}`)}
+        />
+        <label htmlFor="root-note-cp">Root Note</label>
+      </div>
+    );
+  };
+
   return (
     <div className="intervals-container">
       <h1 className="page-title">Intervals</h1>
@@ -39,7 +65,9 @@ export const Intervals = () => {
 
       <div className="intervals-page-section">
         <div className="page-subsection">
-          <ControlPanel />
+          <ControlPanel cardProps={{
+            header: 'Fretboard Controls'
+          }} elements={[rootNoteControls()]} />
         </div>
         <div className="page-subsection">
           <h2>{interval + intervalSuffix(interval)}</h2>
