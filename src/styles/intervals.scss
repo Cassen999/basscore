@@ -1,3 +1,20 @@
+@use './variables.scss' as *;
+
 h1 {
   margin-top: 0px;
+}
+
+.intervals-container {
+  width: 100%;
+  .intervals-page-section {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
+  
+  .p-card {
+    background: $overlays;
+  }
 }

@@ -4,6 +4,7 @@ export const createInterval = ({
   interval,
   flat = false,
   unison = true,
+  colors,
 }: iCreateInterval): iCoords[] => {
   const rootPosition = (() => {
     switch (interval) {
@@ -62,10 +63,10 @@ export const createInterval = ({
     }
   };
 
-  const root: iCoords = { fret: rootPosition, string: 1, root: true };
-  const intervalNote: iCoords = { fret: 6, string: intervalString(interval, flat) };
+  const root: iCoords = { fret: rootPosition, string: 1, color: colors.root };
+  const intervalNote: iCoords = { fret: 6, string: intervalString(interval, flat), color: colors.interval };
   const unisonNote: iCoords | undefined = unison
-    ? { fret: 1, string: unisonString(interval, flat), unison: true }
+    ? { fret: 1, string: unisonString(interval, flat), color: colors.unison }
     : undefined;
 
   return [root, intervalNote, ...(unisonNote ? [unisonNote] : [])];
