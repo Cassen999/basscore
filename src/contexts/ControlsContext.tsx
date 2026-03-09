@@ -5,6 +5,7 @@ const ControlsContext = createContext<iControlsContext | null>(null);
 
 export const ControlsProvider = ({ children }: { children: ReactNode }) => {
   const [interval, setInterval] = useState<tInterval>(2);
+  const [showUnison, setShowUnison] = useState<boolean>(true);
   const [rootColor, setRootColor] = useState<tColorType>('#FFC5D3');
   const [intervalColor, setIntervalColor] = useState<tColorType>('#C9A0DC');
   const [unisonColor, setUnisonColor] = useState<tColorType>('#75DAD7');
@@ -28,11 +29,14 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
     interval: interval,
     setInterval: setInterval,
     intervalColors: intervalColors,
+    showUnison: showUnison,
+    setShowUnison: setShowUnison,
   }), [
     interval,
     rootColor,
     intervalColor,
     unisonColor,
+    showUnison,
   ]);
 
   return (

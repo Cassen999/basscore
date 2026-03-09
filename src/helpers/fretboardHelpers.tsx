@@ -4,7 +4,7 @@ import type { iCoords } from "../types/types";
 const circleRadius = 8;
 const maxStroke = 3;
 const margin = circleRadius + maxStroke / 2 + 2;
-export const fretboardWidth = 500;
+export const fretboardWidth = 700;
 export const fretboardHeight = 200;
 
 export const getY = (stringIndex: number, numFrets: number, numStrings: number) =>

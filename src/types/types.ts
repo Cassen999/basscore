@@ -21,14 +21,6 @@ export interface iFretboardProps {
   height?: number;
 }
 
-export interface iConvertInterval {
-  interval: number;
-  showUnison?: boolean;
-  flat?: boolean;
-}
-
-export type tConvertedInterval = iCoords[];
-
 export type tPatternNumber = 1 | 2 | 3 | 4 | 5;
 
 export type tPatternArray = [tPatternNumber, tPatternNumber, tPatternNumber];
@@ -63,6 +55,8 @@ export interface iCreateInterval {
 
 export type tColorType = ColorPickerChangeEvent['value'];
 
+export type tNoteType = 'root' | 'interval' | 'unison';
+
 export interface iColor {
   color: tColorType;
   setColor: Dispatch<SetStateAction<tColorType>>
@@ -83,9 +77,21 @@ export interface iControlsContext {
   interval: tInterval;
   intervalColors: iIntervalColors;
   setInterval: Dispatch<SetStateAction<tInterval>>,
+  showUnison: boolean;
+  setShowUnison: Dispatch<SetStateAction<boolean>>,
+}
+
+export interface iControlElementGroups {
+  title: string;
+  elements: ReactNode[];
 }
 
 export interface iControlProps {
   cardProps?: CardProps;
-  elements: ReactNode[];
+  elements: ReactNode[] | iControlElementGroups[];
+}
+
+export interface iIntervalSelectItems {
+  name: string;
+  value: tInterval;
 }
