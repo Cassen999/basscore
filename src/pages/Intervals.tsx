@@ -128,7 +128,6 @@ export const Intervals = () => {
             cardProps={{
               header: "Fretboard Controls",
             }}
-            // elements={[noteColorControls('root')]}
             elements={controlsElements}
           />
         </div>

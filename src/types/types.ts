@@ -37,8 +37,14 @@ export interface iScaleString {
   shift?: boolean;
 }
 
-export type tCreateScale = 'major' | 'dorian' | 'phrygian' | 'lydian' | 'mixolydian' | 'minor' | 'locrian'; 
+export type tScaleType = 'major' | 'dorian' | 'phrygian' | 'lydian' | 'mixolydian' | 'minor' | 'locrian'; 
 export type tInterval = 2 | 3 | 4 | 5 | 6 | 7 | 8
+export type tColorType = ColorPickerChangeEvent['value'];
+
+export interface iCreateScale {
+  scaleType: tScaleType;
+  noteColor: tColorType;
+}
 
 export interface iCreateInterval {
   interval: tInterval;
@@ -53,8 +59,6 @@ export interface iCreateInterval {
   }
 }
 
-export type tColorType = ColorPickerChangeEvent['value'];
-
 export type tNoteType = 'root' | 'interval' | 'unison';
 
 export interface iColor {
@@ -64,11 +68,11 @@ export interface iColor {
 
 /** strings can be colors as css would allow */
 export interface iIntervalColors {
-  /** @default #FFC5D3 for root.color */
+  /** @default #a78bfa  for root.color */
   root: iColor;
-  /** @default #C9A0DC for interval.color */
+  /** @default #f7b0d3 for interval.color */
   interval: iColor;
-  /** @default #75DAD7 for unison.color */
+  /** @default #94e0ed for unison.color */
   unison: iColor;
 }
 
@@ -79,6 +83,10 @@ export interface iControlsContext {
   setInterval: Dispatch<SetStateAction<tInterval>>,
   showUnison: boolean;
   setShowUnison: Dispatch<SetStateAction<boolean>>,
+  displayedScales: tScaleType;
+  setDisplayedScales: Dispatch<SetStateAction<tScaleType>>
+  scaleNoteColor: tColorType;
+  setScaleNoteColor: Dispatch<SetStateAction<tColorType>>
 }
 
 export interface iControlElementGroups {
@@ -94,4 +102,9 @@ export interface iControlProps {
 export interface iIntervalSelectItems {
   name: string;
   value: tInterval;
+}
+
+export interface iScaleSelectItems {
+  name: tScaleType;
+  value: tScaleType;
 }
