@@ -105,6 +105,6 @@ export interface iIntervalSelectItems {
 }
 
 export interface iScaleSelectItems {
-  name: tScaleType;
+  name: string;
   value: tScaleType;
 }

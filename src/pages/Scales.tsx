@@ -34,13 +34,13 @@ export const Scales = () => {
 
   const scaleSelect = () => {
     const scaleOptions: iScaleSelectItems[] = [
-      { name: "major", value: "major" },
-      { name: "minor", value: "minor" },
-      { name: "dorian", value: "dorian" },
-      { name: "locrian", value: "locrian" },
-      { name: "lydian", value: "lydian" },
-      { name: "mixolydian", value: "mixolydian" },
-      { name: "phrygian", value: "phrygian" },
+      { name: "Major", value: "major" },
+      { name: "Minor", value: "minor" },
+      { name: "Dorian", value: "dorian" },
+      { name: "Locrian", value: "locrian" },
+      { name: "Lydian", value: "lydian" },
+      { name: "Mixolydian", value: "mixolydian" },
+      { name: "Phrygian", value: "phrygian" },
     ];
 
     return (
