@@ -6,7 +6,6 @@ import { createScale } from "../helpers/createScale";
 import type {
   iControlElementGroups,
   iScaleSelectItems,
-  tColorType,
 } from "../types/types";
 import { ColorPicker } from "primereact/colorpicker";
 import type { ReactNode } from "react";
