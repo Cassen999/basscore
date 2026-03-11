@@ -22,3 +22,6 @@
 
 
 Make root note in createInterval optional
+
+# Dictionary
+hover state on words that pops up a dictionary component with the definition
