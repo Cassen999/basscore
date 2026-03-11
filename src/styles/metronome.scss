@@ -1,0 +1,23 @@
+.metronome-container {
+  display: flex;
+  flex-direction: row-reverse;
+  height: fit-content;
+  gap: 2rem;
+  .start-metronome-btn {
+    display: flex;
+    align-items: center;
+  }
+  .metronome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 15rem;
+    margin-top: 1rem;
+    span {
+      margin-bottom: 1rem;
+    }
+    .p-slider {
+      width: 100%;
+    }
+  }
+}

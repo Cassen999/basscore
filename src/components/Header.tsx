@@ -9,6 +9,7 @@ export const Header = () => {
 
   const items: MenuItem[] = [
     { label: "Home", command: () => nav("/home") },
+    { label: "Metronome", command: () => nav("/metronome")},
     { label: "Scales", command: () => nav("/scales") },
     { label: "Intervals", command: () => nav("/intervals") },
   ];
