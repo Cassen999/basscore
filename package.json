@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://cassen999.github.io/basscore",
   "scripts": {
     "start": "vite",
     "build": "tsc -b && vite build",
