@@ -1,6 +1,7 @@
-import type { iCoords, iPatterns, iScaleString, tCreateScale } from "../types/types";
+import type { iCoords, iPatterns, iScaleString, iCreateScale } from "../types/types";
 
-export const createScale = (scaleType: tCreateScale) => {
+export const createScale = (props: iCreateScale) => {
+  const { scaleType, noteColor } = props;
   const patterns: iPatterns = {
     w: [1, 3, 5],
     l: [1, 2, 4],
@@ -68,9 +69,9 @@ export const createScale = (scaleType: tCreateScale) => {
         // sp = string pattern
         patterns[p.pattern].forEach((sp) => {
           if (p.shift) {
-            coordsArray.push({ string: p.string, fret: sp + 1})
+            coordsArray.push({ string: p.string, fret: sp + 1, color: noteColor })
           } else {
-            coordsArray.push({ string: p.string, fret: sp })
+            coordsArray.push({ string: p.string, fret: sp, color: noteColor })
           }
         })
       })

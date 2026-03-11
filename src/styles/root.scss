@@ -37,8 +37,14 @@ p {
   line-height: 1.6;
 }
 
+.p-card {
+  background: $overlays;
+}
+
 :root {
   background-color: $background;
   color: $primary-text;
   font-size: 16px;
+  --secondary-color: var(--pink-200);
+  --tertiary-color: var(--cyan-200);
 }
