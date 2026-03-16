@@ -1,7 +1,7 @@
 import Fretboard from "../components/Fretboard";
-import { createInterval } from "../helpers/createInterval";
+import { createInterval } from "../helpers/fretpoints";
 import { useControls } from "../contexts/ControlsContext";
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import ControlPanel from "../components/ControlPanel";
 import { ColorPicker } from "primereact/colorpicker";
 import type {
@@ -19,7 +19,11 @@ export const Intervals = () => {
     intervalColors,
     showUnison,
     setShowUnison,
+    fretboardConfig,
+    setFretboardConfig,
   } = useControls();
+
+  useEffect(() => setFretboardConfig({ ...fretboardConfig ,numFrets: 7 }), []);
 
   const intervalSuffix = (interval: number): string => {
     switch (interval) {
@@ -133,7 +137,7 @@ export const Intervals = () => {
         </div>
         <div className="page-subsection">
           <h2>{interval + intervalSuffix(interval)}</h2>
-          <Fretboard coords={coords} numFrets={6} />
+          <Fretboard coords={coords} />
         </div>
       </div>
     </div>

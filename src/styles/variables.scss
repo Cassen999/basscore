@@ -16,12 +16,12 @@ $colors: (
 );
 
 // text
-$primary-text: map-get($colors, 'gray0');
-$secondary-text: map-get($colors, 'gray200');
+$primary-text: map.get($colors, 'gray0');
+$secondary-text: map.get($colors, 'gray200');
 
 // backgrounds
-$background: map-get($colors, 'gray700');
-$overlays: map-get($colors, 'gray850');
+$background: map.get($colors, 'gray700');
+$overlays: map.get($colors, 'gray850');
 
 // hovers
-$overlay-hover: map-get($colors, 'gray600');
+$overlay-hover: map.get($colors, 'gray600');

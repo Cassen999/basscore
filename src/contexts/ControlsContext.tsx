@@ -5,12 +5,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type {
-  iControlsContext,
-  iIntervalColors,
-  tColorType,
-  tInterval,
-  tScaleType,
+import {
+  type iFretboardConfig,
+  type iControlsContext,
+  type iIntervalColors,
+  type tColorType,
+  type tInterval,
+  type tScaleType,
 } from "../types/types";
 
 const ControlsContext = createContext<iControlsContext | null>(null);
@@ -28,6 +29,13 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
   const [displayedScales, setDisplayedScales] = useState<tScaleType>("major");
   const [scaleNoteColor, setScaleNoteColor] =
     useState<tColorType>(baseNoteColor);
+  const [fretboardConfig, setFretboardConfig] = useState<iFretboardConfig>({
+    width: 700,
+    height: 200,
+    numFrets: 5,
+    numStrings: 4,
+    fretpointRadius: 8,
+  })
 
   const intervalColors: iIntervalColors = {
     root: {
@@ -55,6 +63,8 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       setDisplayedScales: setDisplayedScales,
       scaleNoteColor: scaleNoteColor,
       setScaleNoteColor: setScaleNoteColor,
+      fretboardConfig: fretboardConfig,
+      setFretboardConfig: setFretboardConfig,
     }),
     [
       interval,
@@ -64,6 +74,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       showUnison,
       displayedScales,
       scaleNoteColor,
+      fretboardConfig,
     ],
   );
 
