@@ -11,14 +11,6 @@ export interface iCoords {
 export interface iFretboardProps {
   /** List of fret coordinates */
   coords?: iCoords[];
-  /** @default 5 Number of frets to render */
-  numFrets?: 5 | 6;
-  /** @default 4 Number of strings to render */
-  numStrings?: 4 | 5 | 6
-  /** @default 500 Width of fretboard in px */
-  width?: number;
-  /** @default 200 Height of fretboard in px */
-  height?: number;
 }
 
 export type tPatternNumber = 1 | 2 | 3 | 4 | 5;
@@ -76,6 +68,19 @@ export interface iIntervalColors {
   unison: iColor;
 }
 
+export interface iFretboardConfig {
+  /** @default 700 Width of fretboard in px */
+  width: number;
+  /** @default 200 Height of fretboard in px */
+  height: number;
+  /** @default 6 Number of frets to display */
+  numFrets: number;
+  /** @default 4 Number of strings to display */
+  numStrings: number;
+  /** @default 8 Radius of fretpoint dot in px */
+  fretpointRadius: number;
+}
+
 export interface iControlsContext {
   /** @default 2 */
   interval: tInterval;
@@ -87,6 +92,8 @@ export interface iControlsContext {
   setDisplayedScales: Dispatch<SetStateAction<tScaleType>>
   scaleNoteColor: tColorType;
   setScaleNoteColor: Dispatch<SetStateAction<tColorType>>
+  fretboardConfig: iFretboardConfig;
+  setFretboardConfig: Dispatch<SetStateAction<iFretboardConfig>>;
 }
 
 export interface iControlElementGroups {

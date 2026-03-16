@@ -1,9 +1,10 @@
+@use 'sass:map';
 @use './variables.scss' as *;
 
 .fret-lines {
-  stroke: map-get($colors, 'gray200');
+  stroke: map.get($colors, 'gray200');
 }
 
 .string-lines {
-  stroke: map-get($colors, 'gray200');
+  stroke: map.get($colors, 'gray200');
 }

@@ -53,7 +53,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: map-get($colors, 'gray300');
+      background-color: map.get($colors, 'gray300');
       border-radius: 8px;
     }
   }

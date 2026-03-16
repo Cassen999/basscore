@@ -5,23 +5,23 @@ import type { ReactNode } from "react";
 const ControlPanel = (props: iControlProps) => {
   const elementMapping = (): ReactNode => {
     const { elements } = props;
-    return elements.map((el) => {
+    return elements.map((el, i) => {
       if (el && typeof el === "object" && "type" in el) {
         return (
           <div>
             {elements.map((el) => {
-              return <div className="control-element">{el as ReactNode}</div>;
+              return <div key={i} className="control-element">{el as ReactNode}</div>;
             })}
           </div>
         );
       } else {
         const elGroup = el as iControlElementGroups;
         return (
-          <div className="control-group">
+          <div className="control-group" key={i}>
             <span>{elGroup.title}</span>
             <div className='mapped-controls'>
-              {elGroup.elements.map((el) => (
-                <div>{el}</div>
+              {elGroup.elements.map((el, index) => (
+                <div key={index}>{el}</div>
               ))}
             </div>
           </div>

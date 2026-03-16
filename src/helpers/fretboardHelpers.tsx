@@ -1,26 +1,39 @@
-import type { iCoords } from "../types/types";
+import type { iCoords, iFretboardConfig } from "../types/types";
 
 // possibly user settings
 const circleRadius = 8;
 const maxStroke = 3;
 const margin = circleRadius + maxStroke / 2 + 2;
-export const fretboardWidth = 700;
-export const fretboardHeight = 200;
 
-export const getY = (stringIndex: number, numFrets: number, numStrings: number) =>
-  margin +
-  (numStrings - stringIndex) * ((fretboardHeight - 2 * margin) / numFrets);
+export const getY = (
+  stringIndex: number,
+  fretboardConfig: iFretboardConfig,
+) => {
+  const { numStrings, height } = fretboardConfig;
 
-export const getX = (fretIndex: number, numFrets: number) =>
-  margin + fretIndex * ((fretboardWidth - 2 * margin) / numFrets);
+  return (
+    margin + (numStrings - stringIndex) * ((height - 2 * margin) / numStrings)
+  );
+};
 
-export const getColor = () => {}
+export const getX = (fretIndex: number, fretboardConfig: iFretboardConfig) => {
+  const { width, numFrets } = fretboardConfig;
 
-export const mapFretPoints = (coords: iCoords[], numFrets: number, numStrings: number) => {
+  return margin + fretIndex * ((width - 2 * margin) / numFrets);
+};
+
+export const getColor = () => {};
+
+export const mapFretPoints = (
+  coords: iCoords[],
+  fretboardConfig: iFretboardConfig,
+) => {
   const getCircleX = (fretIndex: number) =>
-    (getX(fretIndex - 1, numFrets) + getX(fretIndex, numFrets)) / 2;
+    (getX(fretIndex - 1, fretboardConfig) + getX(fretIndex, fretboardConfig)) /
+    2;
 
-  const getCircleY = (stringIndex: number) => getY(stringIndex, numFrets, numStrings);
+  const getCircleY = (stringIndex: number) =>
+    getY(stringIndex, fretboardConfig);
 
   return coords.map((coord, i) => {
     const { string, fret, color } = coord;
@@ -29,7 +42,7 @@ export const mapFretPoints = (coords: iCoords[], numFrets: number, numStrings: n
         key={`fretpoint-${i}`}
         cx={getCircleX(fret)}
         cy={getCircleY(string)}
-        r={8}
+        r={fretboardConfig.fretpointRadius}
         fill={color as string}
       />
     );

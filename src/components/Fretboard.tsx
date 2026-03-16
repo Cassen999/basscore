@@ -1,36 +1,35 @@
 import type { iFretboardProps } from "../types/types";
 import {
-  fretboardHeight,
-  fretboardWidth,
   getX,
   getY,
   mapFretPoints,
 } from "../helpers/fretboardHelpers";
 import { useMemo } from "react";
+import { useControls } from "../contexts/ControlsContext";
 
 const Fretboard = (props?: iFretboardProps) => {
-  const numFrets = props?.numFrets ?? 5;
-  const numStrings = props?.numStrings ?? 4;
+  const { fretboardConfig } = useControls();
+  const { numFrets, numStrings, width, height } = fretboardConfig;
 
   const fretPoints = useMemo(() => {
     if (!props?.coords) return [];
-    return mapFretPoints(props.coords, numFrets,  numStrings)
+    return mapFretPoints(props.coords, fretboardConfig);
   }, [props?.coords, numFrets, numStrings]);
   
   return (
     <svg
-      width={fretboardWidth}
-      height={fretboardHeight}
+      width={width}
+      height={height}
     >
       {/* Fret Lines */}
       {Array.from({ length: numFrets + 1 }).map((_, i) => (
         <line
           className='fret-lines'
           key={`fret-${i}`}
-          x1={getX(i, numFrets)}
-          y1={getY(1, numFrets, numStrings)}
-          x2={getX(i, numFrets)}
-          y2={getY(numStrings, numFrets, numStrings)}
+          x1={getX(i, fretboardConfig)}
+          y1={getY(1, fretboardConfig)}
+          x2={getX(i, fretboardConfig)}
+          y2={getY(numStrings, fretboardConfig)}
           strokeWidth={2}
         />
       ))}
@@ -39,10 +38,10 @@ const Fretboard = (props?: iFretboardProps) => {
       {Array.from({ length: numStrings }).map((_, i) => (
         <line
           key={`string-${i}`}
-          x1={getX(0, numFrets)}
-          y1={getY(i + 1, numFrets, numStrings)}
-          x2={getX(numFrets, numFrets)}
-          y2={getY(i + 1, numFrets, numStrings)}
+          x1={getX(0, fretboardConfig)}
+          y1={getY(i + 1, fretboardConfig)}
+          x2={getX(numFrets, fretboardConfig)}
+          y2={getY(i + 1, fretboardConfig)}
           className='string-lines'
           strokeWidth={3 - i * 0.5}
         />

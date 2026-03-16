@@ -2,13 +2,13 @@ import { SelectButton } from "primereact/selectbutton";
 import ControlPanel from "../components/ControlPanel";
 import Fretboard from "../components/Fretboard";
 import { useControls } from "../contexts/ControlsContext";
-import { createScale } from "../helpers/createScale";
+import { createScale } from "../helpers/fretpoints";
 import type {
   iControlElementGroups,
   iScaleSelectItems,
 } from "../types/types";
 import { ColorPicker } from "primereact/colorpicker";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 export const Scales = () => {
   const {
@@ -16,7 +16,11 @@ export const Scales = () => {
     setScaleNoteColor,
     setDisplayedScales,
     displayedScales,
+    fretboardConfig,
+    setFretboardConfig,
   } = useControls();
+
+  useEffect(() => setFretboardConfig({ ...fretboardConfig, numFrets: 5 }), [])
 
   const noteColorControls = (): ReactNode => {
     return (
