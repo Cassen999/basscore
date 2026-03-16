@@ -9,7 +9,7 @@ import { useControls } from "../contexts/ControlsContext";
 
 const Fretboard = (props?: iFretboardProps) => {
   const { fretboardConfig } = useControls();
-  const { numFrets, numStrings, width, height } = fretboardConfig;
+  const { numFrets, numStrings, width } = fretboardConfig;
 
   const fretPoints = useMemo(() => {
     if (!props?.coords) return [];
@@ -19,7 +19,7 @@ const Fretboard = (props?: iFretboardProps) => {
   return (
     <svg
       width={width}
-      height={height}
+      height='auto'
     >
       {/* Fret Lines */}
       {Array.from({ length: numFrets + 1 }).map((_, i) => (

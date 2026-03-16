@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import "./styles/index.scss";
 import { HomeContainer } from "./pages/HomeContainer";
 import { Metronome } from "./components/Metronome";
+import 'primeicons/primeicons.css';
 
 function App() {
   return (

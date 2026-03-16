@@ -13,4 +13,23 @@ h1 {
     padding-left: 5rem;
     padding-right: 5rem;
   }
+
+  .page-subsection {
+    .fretboard-vertical {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      .fretboard {
+        display: inline-block;
+        flex-shrink: 0;
+        flex-grow: 0;
+        transform: rotate(90deg);
+        transform-origin: center center;
+        svg {
+          
+        }
+      }
+    }
+  }
 }

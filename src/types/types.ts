@@ -2,6 +2,11 @@ import type { CardProps } from "primereact/card";
 import type { ColorPickerChangeEvent } from 'primereact/colorpicker';
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 
+export interface iWindowSize {
+  width: number;
+  height: number;
+}
+
 export interface iCoords {
   string: number;
   fret: number;
@@ -71,7 +76,7 @@ export interface iIntervalColors {
 export interface iFretboardConfig {
   /** @default 700 Width of fretboard in px */
   width: number;
-  /** @default 200 Height of fretboard in px */
+  /** @default 180 Height of fretboard in px, changing this can make css weird */
   height: number;
   /** @default 6 Number of frets to display */
   numFrets: number;
@@ -94,6 +99,7 @@ export interface iControlsContext {
   setScaleNoteColor: Dispatch<SetStateAction<tColorType>>
   fretboardConfig: iFretboardConfig;
   setFretboardConfig: Dispatch<SetStateAction<iFretboardConfig>>;
+  isMobile: boolean;
 }
 
 export interface iControlElementGroups {

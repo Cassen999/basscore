@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -13,29 +14,33 @@ import {
   type tInterval,
   type tScaleType,
 } from "../types/types";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 const ControlsContext = createContext<iControlsContext | null>(null);
 
 export const ControlsProvider = ({ children }: { children: ReactNode }) => {
+  const { width } = useWindowSize();
+  const isMobile = width <= 768;
   const rootStyles = getComputedStyle(document.documentElement);
-  const baseNoteColor = rootStyles.getPropertyValue('--primary-color');
-  const intervalNoteColor = rootStyles.getPropertyValue('--secondary-color');
-  const unisonNoteColor = rootStyles.getPropertyValue('--tertiary-color');
+  const baseNoteColor = rootStyles.getPropertyValue("--primary-color");
+  const intervalNoteColor = rootStyles.getPropertyValue("--secondary-color");
+  const unisonNoteColor = rootStyles.getPropertyValue("--tertiary-color");
   const [interval, setInterval] = useState<tInterval>(2);
   const [showUnison, setShowUnison] = useState<boolean>(true);
   const [rootColor, setRootColor] = useState<tColorType>(baseNoteColor);
-  const [intervalColor, setIntervalColor] = useState<tColorType>(intervalNoteColor);
+  const [intervalColor, setIntervalColor] =
+    useState<tColorType>(intervalNoteColor);
   const [unisonColor, setUnisonColor] = useState<tColorType>(unisonNoteColor);
   const [displayedScales, setDisplayedScales] = useState<tScaleType>("major");
   const [scaleNoteColor, setScaleNoteColor] =
     useState<tColorType>(baseNoteColor);
   const [fretboardConfig, setFretboardConfig] = useState<iFretboardConfig>({
-    width: 700,
-    height: 200,
+    width: isMobile ? 500 : 700,
+    height: 190,
     numFrets: 5,
     numStrings: 4,
     fretpointRadius: 8,
-  })
+  });
 
   const intervalColors: iIntervalColors = {
     root: {
@@ -65,6 +70,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       setScaleNoteColor: setScaleNoteColor,
       fretboardConfig: fretboardConfig,
       setFretboardConfig: setFretboardConfig,
+      isMobile: isMobile,
     }),
     [
       interval,
@@ -75,6 +81,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       displayedScales,
       scaleNoteColor,
       fretboardConfig,
+      isMobile,
     ],
   );
 

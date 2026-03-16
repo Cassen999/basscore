@@ -21,9 +21,10 @@ export const Intervals = () => {
     setShowUnison,
     fretboardConfig,
     setFretboardConfig,
+    isMobile,
   } = useControls();
 
-  useEffect(() => setFretboardConfig({ ...fretboardConfig ,numFrets: 7 }), []);
+  useEffect(() => setFretboardConfig({ ...fretboardConfig, numFrets: 7 }), []);
 
   const intervalSuffix = (interval: number): string => {
     switch (interval) {
@@ -105,7 +106,7 @@ export const Intervals = () => {
 
   const controlsElements: iControlElementGroups[] = [
     {
-      title: 'Interval',
+      title: "Interval",
       elements: [intervalSelect()],
     },
     {
@@ -121,6 +122,7 @@ export const Intervals = () => {
       elements: [noteColorControls("unison"), unisonSwitch()],
     },
   ];
+  console.log(fretboardConfig.width + 100);
 
   return (
     <div className="intervals-container">
@@ -137,7 +139,16 @@ export const Intervals = () => {
         </div>
         <div className="page-subsection">
           <h2>{interval + intervalSuffix(interval)}</h2>
-          <Fretboard coords={coords} />
+          <div
+            className={`fretboard-${!isMobile ? "horizontal" : "vertical"}`}
+            style={{ height: `${fretboardConfig.width + 50}px` }}
+          >
+            {isMobile && <span>Nut</span>}
+            <div className="fretboard">
+              <Fretboard coords={coords} />
+            </div>
+            {isMobile && <span>Bridge</span>}
+          </div>
         </div>
       </div>
     </div>

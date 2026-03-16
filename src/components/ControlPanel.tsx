@@ -1,8 +1,22 @@
 import { Card } from "primereact/card";
 import type { iControlElementGroups, iControlProps } from "../types/types";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { useControls } from "../contexts/ControlsContext";
+import { Sidebar } from "primereact/sidebar";
+import { Button } from "primereact/button";
+import pentagram from "../assets/pentagram.png";
 
 const ControlPanel = (props: iControlProps) => {
+  const { isMobile } = useControls();
+  const [visible, setVisible] = useState<boolean>(false);
+
+  const btnLabel = (
+    <div className={`controls-btn-label ${visible ? 'flip-btn-label' : ''}`}>
+      <img src={pentagram} />
+      <i className='pi pi-angle-right' style={{ color: 'black' }} />
+    </div>
+  );
+
   const elementMapping = (): ReactNode => {
     const { elements } = props;
     return elements.map((el, i) => {
@@ -10,7 +24,11 @@ const ControlPanel = (props: iControlProps) => {
         return (
           <div>
             {elements.map((el) => {
-              return <div key={i} className="control-element">{el as ReactNode}</div>;
+              return (
+                <div key={i} className="control-element">
+                  {el as ReactNode}
+                </div>
+              );
             })}
           </div>
         );
@@ -19,7 +37,7 @@ const ControlPanel = (props: iControlProps) => {
         return (
           <div className="control-group" key={i}>
             <span>{elGroup.title}</span>
-            <div className='mapped-controls'>
+            <div className="mapped-controls">
               {elGroup.elements.map((el, index) => (
                 <div key={index}>{el}</div>
               ))}
@@ -29,7 +47,28 @@ const ControlPanel = (props: iControlProps) => {
       }
     });
   };
-  return <Card {...props?.cardProps}>{elementMapping()}</Card>;
+
+  const controlCard = <Card {...props?.cardProps}>{elementMapping()}</Card>;
+  return (
+    <div>
+      {isMobile ? (
+        <div className='mobile-controls'>
+          <Sidebar
+            visible={visible}
+            position="left"
+            onHide={() => setVisible(false)}
+          >
+            {controlCard}
+          </Sidebar>
+          <Button className='mobile-btn' onClick={() => setVisible(true)}>
+            {btnLabel}
+          </Button>
+        </div>
+      ) : (
+        controlCard
+      )}
+    </div>
+  );
 };
 
 export default ControlPanel;
