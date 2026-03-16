@@ -1,5 +1,12 @@
 @use 'sass:map';
 
+$breakpoints: (
+  'mobile': 0,
+  'tablet': 768px,
+  'desktop': 1024px,
+  'wide': 1280px,
+);
+
 $colors: (
   'gray0': #F9F9F9,
   'gray50': #EBEBEB,
