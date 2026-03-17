@@ -1,0 +1,45 @@
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem;
+}
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.footer-left,
+.footer-right,
+.footer-center {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  p {
+    margin: 0;
+  }
+}
+
+.footer-center {
+  text-align: center;
+  flex: 1;
+}
+
+.footer-left {
+  align-items: flex-start;
+}
+
+.footer-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.initials {
+  margin: auto;
+  img {
+    height: 50px;
+    width: 50px;
+  }
+}

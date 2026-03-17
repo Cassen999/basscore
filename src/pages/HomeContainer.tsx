@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/Header";
 import { ControlsProvider } from "../contexts/ControlsContext";
+import Footer from "../components/Footer";
 
 export const HomeContainer = () => {
   return (
@@ -11,6 +12,7 @@ export const HomeContainer = () => {
           <Outlet />
         </ControlsProvider>
       </main>
+      <Footer />
     </div>
   );
 };
