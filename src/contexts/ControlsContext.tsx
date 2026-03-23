@@ -35,12 +35,19 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
   const [scaleNoteColor, setScaleNoteColor] =
     useState<tColorType>(baseNoteColor);
   const [fretboardConfig, setFretboardConfig] = useState<iFretboardConfig>({
-    width: isMobile ? 500 : 700,
+    width: isMobile ? 400 : 700,
     height: 190,
     numFrets: 5,
     numStrings: 4,
     fretpointRadius: 8,
   });
+
+  useEffect(() => {
+    setFretboardConfig((prev) => ({
+      ...prev,
+      width: isMobile ? 400 : 700,
+    }));
+  }, [isMobile]);
 
   const intervalColors: iIntervalColors = {
     root: {

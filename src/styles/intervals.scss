@@ -10,8 +10,8 @@ h1 {
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
-    padding-left: 5rem;
-    padding-right: 5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 
   .page-subsection {
@@ -20,6 +20,7 @@ h1 {
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      min-height: max-content;
       .fretboard {
         display: inline-block;
         flex-shrink: 0;

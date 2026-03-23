@@ -8,13 +8,15 @@ import { useMemo } from "react";
 import { useControls } from "../contexts/ControlsContext";
 
 const Fretboard = (props?: iFretboardProps) => {
-  const { fretboardConfig } = useControls();
+  const { fretboardConfig, isMobile } = useControls();
   const { numFrets, numStrings, width } = fretboardConfig;
 
   const fretPoints = useMemo(() => {
     if (!props?.coords) return [];
     return mapFretPoints(props.coords, fretboardConfig);
   }, [props?.coords, numFrets, numStrings]);
+
+  console.log('width', isMobile)
   
   return (
     <svg

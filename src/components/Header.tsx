@@ -21,7 +21,10 @@ export const Header = () => {
       </div>
 
       <div style={{ marginTop: '1rem' }}>
-        <Menubar model={items} />
+        <Menubar
+          model={items}
+          className='main-menu'
+        />
       </div>
     </div>
   );

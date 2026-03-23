@@ -1,5 +1,10 @@
 @use './variables.scss' as *;
 
+.controls-container {
+  display: flex;
+  min-height: max-content;
+}
+
 .p-card-header {
   font-size: 1.2rem;
   padding: 1rem;

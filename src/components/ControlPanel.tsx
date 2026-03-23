@@ -50,7 +50,7 @@ const ControlPanel = (props: iControlProps) => {
 
   const controlCard = <Card {...props?.cardProps}>{elementMapping()}</Card>;
   return (
-    <div>
+    <div className='controls-container'>
       {isMobile ? (
         <div className='mobile-controls'>
           <Sidebar
