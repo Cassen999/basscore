@@ -27,18 +27,19 @@ export const MetronomePage = () => {
   return (
     <div className="metronome-container">
       <div className="metronome-controls">
-        <div className="bpm-input">
-          <label htmlFor="bpm-input">BPM</label>
+        <label className="bpm-inputnumber">
+          BPM
           <InputNumber
-            id="bpm-input"
+            inputId="bpm-input"
+            name="bpm"
             min={40}
             max={240}
             value={bpm}
             onValueChange={(e) => setBpm(e.value!!)}
           />
-        </div>
-        <div className="subdivision-input">
-          <label htmlFor="subdivision-input">Subdivision</label>
+        </label>
+        <label className="subdivision-input">
+          Subdivision
           <Dropdown
             id="subdivision-input"
             value={subDiv}
@@ -47,7 +48,7 @@ export const MetronomePage = () => {
             optionLabel="name"
             placeholder="Subdivisions"
           />
-        </div>
+        </label>
       </div>
       <Button
         label={isPlaying ? "Stop" : "Start"}
