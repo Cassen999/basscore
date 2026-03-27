@@ -4,7 +4,7 @@ import { Scales } from "./pages/Scales";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./styles/index.scss";
 import { HomeContainer } from "./pages/HomeContainer";
-import { Metronome } from "./components/Metronome";
+import { MetronomePage } from "./pages/Metronome";
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
         <Route path="home" element={<Home />} />
         <Route path="scales" element={<Scales />} />
         <Route path="intervals" element={<Intervals />} />
-        <Route path="metronome" element={<Metronome />} />
+        <Route path="metronome" element={<MetronomePage />} />
       </Route>
     </Routes>
   );

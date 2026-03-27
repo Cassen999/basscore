@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "primereact/button";
-import { Slider } from "primereact/slider";
+import type { iMetronome } from "../types/types";
 
-export const Metronome = () => {
-  const [bpm, setBpm] = useState(120);
-  const [isPlaying, setIsPlaying] = useState(false);
+export const Metronome = (props: iMetronome) => {
+  const { bpm, subdivision, isPlaying } = props;
+
+  useEffect(() => {
+    if (!isPlaying) return;
+    stop();
+  }, [bpm]);
 
   const clickRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -29,45 +32,33 @@ export const Metronome = () => {
     oscillator.stop(ctx.currentTime + 0.05);
   };
 
-  const start = () => {
-    if (!clickRef.current) {
-      clickRef.current = new (
-        window.AudioContext || (window as any).webkitAudioContext
-      )();
-    }
-
-    setIsPlaying(true);
-
-    const interval = (60 / bpm) * 1000;
-    timerRef.current = window.setInterval(playClick, interval);
-  };
-
-  const stop = () => {
-    setIsPlaying(false);
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
-    }
-  };
-
   useEffect(() => {
-    if (!isPlaying) return;
-
-    stop();
-    start();
-  }, [bpm]);
+    if (isPlaying) {
+      if (!clickRef.current) {
+        clickRef.current = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
+      } else {
+        if (timerRef.current) {
+          window.clearInterval(timerRef.current);
+        } else {
+          throw new Error('Error with timer ref')
+        }
+      }
+      const interval = (60 / bpm) * 1000;
+      timerRef.current = window.setInterval(playClick, interval);
+    } else {
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+      }
+    }
+  }, [isPlaying, bpm]);
 
   return (
-    <div className="metronome-container">
-      <div className='start-metronome-btn'>
-        <Button onClick={isPlaying ? stop : start}>
-          {isPlaying ? "Stop" : "Start"}
-        </Button>
-      </div>
-
-      <div className='metronome' style={{ display: "flex", alignItems: "center", width: '10rem', marginTop: '1rem' }}>
-        <span>BPM: {bpm}</span>
-        <Slider width='14rem' min={40} max={240} value={bpm} onChange={(e) => setBpm(Number(e.value))} />
-      </div>
+    <div className="start-metronome-btn">
+      {/* <Button onClick={isPlaying ? stop : start}>
+        {isPlaying ? "Stop" : "Start"}
+      </Button> */}
     </div>
   );
 };

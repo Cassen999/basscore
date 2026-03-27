@@ -115,3 +115,11 @@ export interface iScaleSelectItems {
   name: string;
   value: tScaleType;
 }
+
+export type tSubdivision = 4 | 8 | 16
+
+export interface iMetronome {
+  bpm: number;
+  subdivision: tSubdivision;
+  isPlaying: boolean;
+}
