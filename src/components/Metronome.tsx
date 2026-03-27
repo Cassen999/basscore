@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { iMetronome } from "../types/types";
 
 export const Metronome = (props: iMetronome) => {
@@ -20,7 +20,7 @@ export const Metronome = (props: iMetronome) => {
     const gainNode = ctx.createGain();
 
     oscillator.type = "square";
-    oscillator.frequency.value = 1000; // Frequency in Hz
+    oscillator.frequency.value = 500; // Frequency in Hz
 
     gainNode.gain.setValueAtTime(1, ctx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
@@ -32,6 +32,7 @@ export const Metronome = (props: iMetronome) => {
     oscillator.stop(ctx.currentTime + 0.05);
   };
 
+  // Controls beat subdivision and audio context
   useEffect(() => {
     if (isPlaying) {
       if (!clickRef.current) {
@@ -45,14 +46,14 @@ export const Metronome = (props: iMetronome) => {
           throw new Error('Error with timer ref')
         }
       }
-      const interval = (60 / bpm) * 1000;
+      const interval = (60 / bpm) * 1000 / subdivision;
       timerRef.current = window.setInterval(playClick, interval);
     } else {
       if (timerRef.current) {
         window.clearInterval(timerRef.current);
       }
     }
-  }, [isPlaying, bpm]);
+  }, [isPlaying, bpm, subdivision]);
 
   return (
     <div className="start-metronome-btn">
