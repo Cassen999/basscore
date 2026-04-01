@@ -1,73 +1,104 @@
-import { useEffect, useRef, useState } from "react";
-import { Button } from "primereact/button";
-import { Slider } from "primereact/slider";
+import { useEffect, useRef } from "react";
+import type { iMetronome } from "../types/types";
 
-export const Metronome = () => {
-  const [bpm, setBpm] = useState(120);
-  const [isPlaying, setIsPlaying] = useState(false);
+export const Metronome = (props: iMetronome) => {
+  const { bpm, subdivision, isPlaying, volume } = props;
 
-  const clickRef = useRef<AudioContext | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<number | null>(null);
+  let gainRef = useRef<GainNode | null>(null);
+  let gainNode: GainNode | null = null;
+  let ctx: AudioContext | null = null;
+
+  useEffect(() => {
+    ctx = new AudioContext();
+    gainNode = ctx.createGain()
+
+    gainNode.gain.value = volume;
+    gainNode.connect(ctx.destination);
+
+    audioCtxRef.current = ctx;
+    gainRef.current = gainNode;
+
+    return () => {
+      ctx?.close();
+    };
+  }, []);
 
   const playClick = () => {
-    const ctx = clickRef?.current;
-    if (!ctx) return;
+    const ctx = audioCtxRef?.current;
+    const masterGain = gainRef.current;
+    if (!ctx || !masterGain) return;
 
     const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
     oscillator.type = "square";
-    oscillator.frequency.value = 1000; // Frequency in Hz
+    oscillator.frequency.value = 500; // Frequency in Hz
 
-    gainNode.gain.setValueAtTime(1, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    const sliderGain = ctx.createGain();
 
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    // Connect oscillator to gain node and gain node to context
+    oscillator.connect(sliderGain);
+    sliderGain.connect(masterGain);
+    masterGain.connect(ctx.destination);
+
+    // Set gain node volume
+    sliderGain.gain.setValueAtTime(volume, ctx.currentTime);
+    sliderGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
 
     oscillator.start();
     oscillator.stop(ctx.currentTime + 0.05);
   };
 
-  const start = () => {
-    if (!clickRef.current) {
-      clickRef.current = new (
-        window.AudioContext || (window as any).webkitAudioContext
-      )();
+  const setVolume = (value: number) => {
+    if (gainRef.current && audioCtxRef.current) {
+      gainRef.current.gain.setTargetAtTime(
+        value,
+        audioCtxRef.current.currentTime,
+        0.01
+      )
     }
+  }
 
-    setIsPlaying(true);
-
-    const interval = (60 / bpm) * 1000;
-    timerRef.current = window.setInterval(playClick, interval);
-  };
-
-  const stop = () => {
-    setIsPlaying(false);
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
-    }
-  };
-
+  // Volume control
   useEffect(() => {
-    if (!isPlaying) return;
+    setVolume(volume);
+  }, [volume]);
 
-    stop();
-    start();
-  }, [bpm]);
+  // Controls beat subdivision and audio context
+  useEffect(() => {
+    const interval = (60 / bpm) * 1000 / subdivision;
+    if (isPlaying) {
+      (async () => {
+        const ctx = audioCtxRef.current;
+        if (!ctx) return;
+
+        // Resume audio
+        if (ctx.state === 'suspended') {
+          await ctx.resume();
+        }
+
+        // Clear existing timer
+        if (timerRef.current ?? null) {
+          clearInterval(timerRef.current!!);
+        }
+
+        // Start new timer
+        timerRef.current = window.setInterval(playClick, interval);
+      })()
+    } else {
+      // Stop Metronome
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  }, [isPlaying, bpm, subdivision]);
 
   return (
-    <div className="metronome-container">
-      <div className='start-metronome-btn'>
-        <Button onClick={isPlaying ? stop : start}>
-          {isPlaying ? "Stop" : "Start"}
-        </Button>
-      </div>
-
-      <div className='metronome' style={{ display: "flex", alignItems: "center", width: '10rem', marginTop: '1rem' }}>
-        <span>BPM: {bpm}</span>
-        <Slider width='14rem' min={40} max={240} value={bpm} onChange={(e) => setBpm(Number(e.value))} />
-      </div>
+    <div className="start-metronome-btn">
+      {/* <Button onClick={isPlaying ? stop : start}>
+        {isPlaying ? "Stop" : "Start"}
+      </Button> */}
     </div>
   );
 };

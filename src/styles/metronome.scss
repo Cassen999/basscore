@@ -1,23 +1,30 @@
+
 .metronome-container {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   height: fit-content;
   gap: 2rem;
-  .start-metronome-btn {
-    display: flex;
-    align-items: center;
-  }
-  .metronome {
+  .metronome-controls-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 15rem;
-    margin-top: 1rem;
-    span {
-      margin-bottom: 1rem;
+    gap: 2rem;
+    .metronome-controls {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
     }
-    .p-slider {
-      width: 100%;
+    .bpm-inputnumber {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .subdivision-input {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .volume-slider {
+      height: fit-content;
     }
   }
 }

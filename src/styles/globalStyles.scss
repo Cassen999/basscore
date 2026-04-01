@@ -1,0 +1,6 @@
+@use './variables.scss' as *;
+
+.p-inputtext, .p-dropdown, .p-dropdown-items {
+  background-color: $overlays;
+  border-color: $overlays;
+}
