@@ -68,6 +68,9 @@ export const MetronomePage = () => {
             />
           </label>
         </div>
+        {/** This needs to move for accessibility and tab order
+         * Right now it tabs to the button before the volume
+         */}
         <Button
           label={isPlaying ? "Stop" : "Start"}
           onClick={() => setIsPlaying(!isPlaying)}
