@@ -2,55 +2,94 @@ import { useEffect, useRef } from "react";
 import type { iMetronome } from "../types/types";
 
 export const Metronome = (props: iMetronome) => {
-  const { bpm, subdivision, isPlaying } = props;
+  const { bpm, subdivision, isPlaying, volume } = props;
+
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const timerRef = useRef<number | null>(null);
+  let gainRef = useRef<GainNode | null>(null);
+  let gainNode: GainNode | null = null;
+  let ctx: AudioContext | null = null;
 
   useEffect(() => {
-    if (!isPlaying) return;
-    stop();
-  }, [bpm]);
+    ctx = new AudioContext();
+    gainNode = ctx.createGain()
 
-  const clickRef = useRef<AudioContext | null>(null);
-  const timerRef = useRef<number | null>(null);
+    gainNode.gain.value = volume;
+    gainNode.connect(ctx.destination);
+
+    audioCtxRef.current = ctx;
+    gainRef.current = gainNode;
+
+    return () => {
+      ctx?.close();
+    };
+  }, []);
 
   const playClick = () => {
-    const ctx = clickRef?.current;
-    if (!ctx) return;
+    const ctx = audioCtxRef?.current;
+    const masterGain = gainRef.current;
+    if (!ctx || !masterGain) return;
 
     const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
     oscillator.type = "square";
     oscillator.frequency.value = 500; // Frequency in Hz
 
-    gainNode.gain.setValueAtTime(1, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    const sliderGain = ctx.createGain();
 
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    // Connect oscillator to gain node and gain node to context
+    oscillator.connect(sliderGain);
+    sliderGain.connect(masterGain);
+    masterGain.connect(ctx.destination);
+
+    // Set gain node volume
+    sliderGain.gain.setValueAtTime(volume, ctx.currentTime);
+    sliderGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
 
     oscillator.start();
     oscillator.stop(ctx.currentTime + 0.05);
   };
 
+  const setVolume = (value: number) => {
+    if (gainRef.current && audioCtxRef.current) {
+      gainRef.current.gain.setTargetAtTime(
+        value,
+        audioCtxRef.current.currentTime,
+        0.01
+      )
+    }
+  }
+
+  // Volume control
+  useEffect(() => {
+    setVolume(volume);
+  }, [volume]);
+
   // Controls beat subdivision and audio context
   useEffect(() => {
+    const interval = (60 / bpm) * 1000 / subdivision;
     if (isPlaying) {
-      if (!clickRef.current) {
-        clickRef.current = new (
-          window.AudioContext || (window as any).webkitAudioContext
-        )();
-      } else {
-        if (timerRef.current) {
-          window.clearInterval(timerRef.current);
-        } else {
-          throw new Error('Error with timer ref')
+      (async () => {
+        const ctx = audioCtxRef.current;
+        if (!ctx) return;
+
+        // Resume audio
+        if (ctx.state === 'suspended') {
+          await ctx.resume();
         }
-      }
-      const interval = (60 / bpm) * 1000 / subdivision;
-      timerRef.current = window.setInterval(playClick, interval);
+
+        // Clear existing timer
+        if (timerRef.current ?? null) {
+          clearInterval(timerRef.current!!);
+        }
+
+        // Start new timer
+        timerRef.current = window.setInterval(playClick, interval);
+      })()
     } else {
+      // Stop Metronome
       if (timerRef.current) {
         window.clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     }
   }, [isPlaying, bpm, subdivision]);

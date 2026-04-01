@@ -122,4 +122,5 @@ export interface iMetronome {
   bpm: number;
   subdivision: tSubdivision;
   isPlaying: boolean;
+  volume: number;
 }
