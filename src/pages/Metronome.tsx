@@ -68,32 +68,27 @@ export const MetronomePage = () => {
             />
           </label>
         </div>
-        {/** This needs to move for accessibility and tab order
-         * Right now it tabs to the button before the volume
-         */}
-        <Button
-          label={isPlaying ? "Stop" : "Start"}
-          onClick={() => setIsPlaying(!isPlaying)}
-        />
+        <div className="volume-slider">
+          <Tooltip
+            target=".volume-slider"
+            content={`Volume: ${volume}`}
+          />
+          <Slider
+            value={volume}
+            onChange={(e) => {
+              console.log("e", e.value);
+              setVolume(e.value as number);
+            }}
+            orientation="vertical"
+            min={0}
+            max={100}
+          />
+        </div>
       </div>
-      <div className="volume-slider">
-        <Tooltip
-          target=".volume-slider"
-          content="Volume"
-          mouseTrack
-          mouseTrackLeft={10}
-        />
-        <Slider
-          value={volume}
-          onChange={(e) => {
-            console.log("e", e.value);
-            setVolume(e.value as number);
-          }}
-          orientation="vertical"
-          min={0}
-          max={100}
-        />
-      </div>
+      <Button
+        label={isPlaying ? "Stop" : "Start"}
+        onClick={() => setIsPlaying(!isPlaying)}
+      />
       <Metronome
         bpm={bpm}
         subdivision={subDiv}
