@@ -1,4 +1,4 @@
-@use 'sass:map';
+@use "sass:map";
 @use "./variables.scss" as *;
 
 .app-container {
@@ -53,7 +53,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: map.get($colors, 'gray300');
+      background-color: map.get($colors, "gray300");
       border-radius: 8px;
     }
   }
@@ -68,8 +68,27 @@
       border-radius: 4px;
     }
     &.p-focus .p-menuitem-content {
-      background-color: $overlay-hover
+      background-color: $overlay-hover;
     }
   }
 }
 
+.home-container {
+  .offerings-cards {
+    display: flex;
+    gap: 2rem;
+
+    .p-card {
+      flex: 1;
+    }
+
+    .p-card-header {
+      display: flex;
+      justify-content: center;
+      img {
+        height: 200px;
+        width: auto;
+      }
+    }
+  }
+}
