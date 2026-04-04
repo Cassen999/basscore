@@ -1,15 +1,16 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Tooltip } from "primereact/tooltip";
+import type { JSX } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const nav = useNavigate();
+  const getStartedBtn = (url: string): JSX.Element => (
+    <Button label="Get Started" onClick={() => nav(url)} />
+  );
   const metronomeCard = () => {
     const header = <img src="images/metronome-image.png" />;
-    const footer = (
-      <Button label="Get Started" onClick={() => nav("/metronome")} />
-    );
     const content = (
       <p>
         Practice your rhythm by choosing your own subdivision and beats per
@@ -18,7 +19,7 @@ export const Home = () => {
     );
 
     return (
-      <Card title="Metronome" header={header} footer={footer}>
+      <Card title="Metronome" header={header} footer={getStartedBtn('/metronome')}>
         {content}
       </Card>
     );
@@ -26,15 +27,12 @@ export const Home = () => {
 
   const scalesCard = () => {
     const header = <img src="images/scale-image.png" />;
-    const footer = (
-      <Button label="Get Started" onClick={() => nav("/scales")} />
-    );
     const content = (
       <p>Learn your different scale modes applied to the fretboard.</p>
     );
 
     return (
-      <Card title="Scales" header={header} footer={footer}>
+      <Card title="Scales" header={header} footer={getStartedBtn('/scales')}>
         {content}
       </Card>
     );
@@ -42,15 +40,12 @@ export const Home = () => {
 
   const intervalsCard = () => {
     const header = <img src="images/interval-image.png" />;
-    const footer = (
-      <Button label="Get Started" onClick={() => nav("/intervals")} />
-    );
     const content = (
       <p>Learn the different fretboard intervals and their shapes.</p>
     );
 
     return (
-      <Card title="Intervals" header={header} footer={footer}>
+      <Card title="Intervals" header={header} footer={getStartedBtn('/intervals')}>
         {content}
       </Card>
     );
