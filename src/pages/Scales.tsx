@@ -3,12 +3,12 @@ import ControlPanel from "../components/ControlPanel";
 import Fretboard from "../components/Fretboard";
 import { useControls } from "../contexts/ControlsContext";
 import { createScale } from "../helpers/fretpoints";
-import type {
-  iControlElementGroups,
-  iScaleSelectItems,
-} from "../types/types";
+import type { iControlElementGroups, iScaleSelectItems } from "../types/types";
 import { ColorPicker } from "primereact/colorpicker";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
+import _ from "lodash";
+import { DictionaryPanel } from "../components/DictionaryPanel";
+import { OverlayPanel } from "primereact/overlaypanel";
 
 export const Scales = () => {
   const {
@@ -20,7 +20,7 @@ export const Scales = () => {
     setFretboardConfig,
   } = useControls();
 
-  useEffect(() => setFretboardConfig({ ...fretboardConfig, numFrets: 5 }), [])
+  useEffect(() => setFretboardConfig({ ...fretboardConfig, numFrets: 5 }), []);
 
   const noteColorControls = (): ReactNode => {
     return (
@@ -35,17 +35,17 @@ export const Scales = () => {
     );
   };
 
-  const scaleSelect = () => {
-    const scaleOptions: iScaleSelectItems[] = [
-      { name: "Major", value: "major" },
-      { name: "Minor", value: "minor" },
-      { name: "Dorian", value: "dorian" },
-      { name: "Locrian", value: "locrian" },
-      { name: "Lydian", value: "lydian" },
-      { name: "Mixolydian", value: "mixolydian" },
-      { name: "Phrygian", value: "phrygian" },
-    ];
+  const scaleOptions: iScaleSelectItems[] = [
+    { name: "Major", value: "major" },
+    { name: "Dorian", value: "dorian" },
+    { name: "Phrygian", value: "phrygian" },
+    { name: "Lydian", value: "lydian" },
+    { name: "Mixolydian", value: "mixolydian" },
+    { name: "Minor", value: "minor" },
+    { name: "Locrian", value: "locrian" },
+  ];
 
+  const scaleSelect = () => {
     return (
       <div className="interval-select">
         <SelectButton
@@ -69,11 +69,27 @@ export const Scales = () => {
     },
   ];
 
+  const overlayRef = useRef<OverlayPanel>(null);
+
+  const formattedScaleName = (
+    <span
+      onMouseEnter={(e) => overlayRef.current?.show(e, e.target)}
+      onMouseLeave={() => overlayRef.current?.hide()}
+    >
+      <p className="displayed-scale">
+        {displayedScales[0].toUpperCase() + displayedScales.slice(1)}
+      </p>
+    </span>
+  );
+
   return (
     <div className="scales-container">
+      <OverlayPanel ref={overlayRef}>
+        <DictionaryPanel word={displayedScales} />
+      </OverlayPanel>
       <h1 className="page-title">Scales and Positions</h1>
 
-      <div className='scale-page-section'>
+      <div className="scale-page-section">
         <div className="page-subsection">
           <ControlPanel
             cardProps={{
@@ -84,7 +100,10 @@ export const Scales = () => {
         </div>
 
         <div className="page-subsection">
-          <h2 className="page-subtitle">Major (Position 1)</h2>
+          <h2 className="page-subtitle">
+            {formattedScaleName}{" "}
+            {`(Position ${_.findIndex(scaleOptions, { value: displayedScales }) + 1})`}
+          </h2>
           <Fretboard
             coords={createScale({
               scaleType: displayedScales,

@@ -124,3 +124,7 @@ export interface iMetronome {
   isPlaying: boolean;
   volume: number;
 }
+
+export interface iDictionary {
+  word: string;
+}
