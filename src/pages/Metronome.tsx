@@ -12,6 +12,12 @@ interface iSubdivisionMenu {
   value: tSubdivision;
 }
 
+interface iTimeSigMenu {
+  name: string;
+  /** Full time signature string, e.g. "4/4". Numerator is parsed for bpMeasure. */
+  value: string;
+}
+
 const subdivisions: iSubdivisionMenu[] = [
   { name: "Whole Note", value: 0.25 },
   { name: "Half Note", value: 0.5 },
@@ -20,11 +26,43 @@ const subdivisions: iSubdivisionMenu[] = [
   { name: "Sixteenth Note", value: 4 },
 ];
 
+const timeSignatures: iTimeSigMenu[] = [
+  { name: "1/2", value: "1/2" },
+  { name: "2/2", value: "2/2" },
+  { name: "3/2", value: "3/2" },
+  { name: "4/2", value: "4/2" },
+  { name: "1/4", value: "1/4" },
+  { name: "2/4", value: "2/4" },
+  { name: "3/4", value: "3/4" },
+  { name: "4/4", value: "4/4" },
+  { name: "5/4", value: "5/4" },
+  { name: "6/4", value: "6/4" },
+  { name: "7/4", value: "7/4" },
+  { name: "8/4", value: "8/4" },
+  { name: "9/4", value: "9/4" },
+  { name: "10/4", value: "10/4" },
+  { name: "11/4", value: "11/4" },
+  { name: "12/4", value: "12/4" },
+  { name: "1/8", value: "1/8" },
+  { name: "2/8", value: "2/8" },
+  { name: "3/8", value: "3/8" },
+  { name: "4/8", value: "4/8" },
+  { name: "5/8", value: "5/8" },
+  { name: "6/8", value: "6/8" },
+  { name: "7/8", value: "7/8" },
+  { name: "8/8", value: "8/8" },
+  { name: "9/8", value: "9/8" },
+  { name: "10/8", value: "10/8" },
+  { name: "11/8", value: "11/8" },
+  { name: "12/8", value: "12/8" },
+];
+
 export const MetronomePage = () => {
   const [bpm, setBpm] = useState<number>(120);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [subDiv, setSubDiv] = useState<tSubdivision>(subdivisions[2].value);
   const [volume, setVolume] = useState<number>(50);
+  const [timeSig, setTimeSig] = useState<string>("4/4");
 
   return (
     <div className="metronome-container">
@@ -67,6 +105,26 @@ export const MetronomePage = () => {
               placeholder="Subdivisions"
             />
           </label>
+          <Tooltip
+            target=".time-sig-input"
+            content="Time signature"
+            mouseTrack
+            mouseTrackLeft={10}
+          />
+          <label className="time-sig-input">
+            Time Signature
+            <Dropdown
+              id="time-sig-input"
+              value={timeSig}
+              onChange={(e: DropdownChangeEvent) => {
+                setTimeSig(e.value);
+              }}
+              options={timeSignatures}
+              optionLabel="name"
+              optionValue="value"
+              placeholder="Time Signature"
+            />
+          </label>
         </div>
         <div className="volume-slider">
           <Tooltip
@@ -85,16 +143,20 @@ export const MetronomePage = () => {
           />
         </div>
       </div>
-      <Button
-        label={isPlaying ? "Stop" : "Start"}
-        onClick={() => setIsPlaying(!isPlaying)}
-      />
-      <Metronome
-        bpm={bpm}
-        subdivision={subDiv}
-        isPlaying={isPlaying}
-        volume={volume / 100}
-      />
+      <div className="metronome-play-section">
+        <Metronome
+          bpm={bpm}
+          subdivision={subDiv}
+          isPlaying={isPlaying}
+          volume={volume / 100}
+          bpMeasure={parseInt(timeSig.split("/")[0])}
+        />
+        <Button
+          className='start-metronome-btn'
+          label={isPlaying ? "Stop" : "Start"}
+          onClick={() => setIsPlaying(!isPlaying)}
+        />
+      </div>
     </div>
   );
 };

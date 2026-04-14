@@ -123,4 +123,6 @@ export interface iMetronome {
   subdivision: tSubdivision;
   isPlaying: boolean;
   volume: number;
+  /** Number of beats per measure (numerator of time signature) */
+  bpMeasure: number;
 }
