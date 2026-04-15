@@ -15,6 +15,13 @@ $colors: (
   'gray900': #0B0B0B,
 );
 
+$breakpoints: (
+  'sm': 640px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px,
+);
+
 // text
 $primary-text: map.get($colors, 'gray0');
 $secondary-text: map.get($colors, 'gray200');
