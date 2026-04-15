@@ -1,0 +1,40 @@
+import type { iSubdivisionMenu, iTimeSigMenu } from '../types/types';
+
+export const subdivisions: iSubdivisionMenu[] = [
+  { name: 'Whole Note', value: 0.25 },
+  { name: 'Half Note', value: 0.5 },
+  { name: 'Quarter Note', value: 1 },
+  { name: 'Eight Note', value: 2 },
+  { name: 'Sixteenth Note', value: 4 },
+];
+
+export const timeSignatures: iTimeSigMenu[] = [
+  { name: '1/2', value: '1/2' },
+  { name: '2/2', value: '2/2' },
+  { name: '3/2', value: '3/2' },
+  { name: '4/2', value: '4/2' },
+  { name: '1/4', value: '1/4' },
+  { name: '2/4', value: '2/4' },
+  { name: '3/4', value: '3/4' },
+  { name: '4/4', value: '4/4' },
+  { name: '5/4', value: '5/4' },
+  { name: '6/4', value: '6/4' },
+  { name: '7/4', value: '7/4' },
+  { name: '8/4', value: '8/4' },
+  { name: '9/4', value: '9/4' },
+  { name: '10/4', value: '10/4' },
+  { name: '11/4', value: '11/4' },
+  { name: '12/4', value: '12/4' },
+  { name: '1/8', value: '1/8' },
+  { name: '2/8', value: '2/8' },
+  { name: '3/8', value: '3/8' },
+  { name: '4/8', value: '4/8' },
+  { name: '5/8', value: '5/8' },
+  { name: '6/8', value: '6/8' },
+  { name: '7/8', value: '7/8' },
+  { name: '8/8', value: '8/8' },
+  { name: '9/8', value: '9/8' },
+  { name: '10/8', value: '10/8' },
+  { name: '11/8', value: '11/8' },
+  { name: '12/8', value: '12/8' },
+];

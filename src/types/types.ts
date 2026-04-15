@@ -2,6 +2,10 @@ import type { CardProps } from "primereact/card";
 import type { ColorPickerChangeEvent } from 'primereact/colorpicker';
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 
+// Shared Types
+export type tColorType = ColorPickerChangeEvent['value'];
+
+// Fretboard Types
 export interface iCoords {
   string: number;
   fret: number;
@@ -12,6 +16,22 @@ export interface iFretboardProps {
   /** List of fret coordinates */
   coords?: iCoords[];
 }
+
+export interface iFretboardConfig {
+  /** @default 700 Width of fretboard in px */
+  width: number;
+  /** @default 200 Height of fretboard in px */
+  height: number;
+  /** @default 6 Number of frets to display */
+  numFrets: number;
+  /** @default 4 Number of strings to display */
+  numStrings: number;
+  /** @default 8 Radius of fretpoint dot in px */
+  fretpointRadius: number;
+}
+
+// Scale Types
+export type tScaleType = 'major' | 'dorian' | 'phrygian' | 'lydian' | 'mixolydian' | 'minor' | 'locrian';
 
 export type tPatternNumber = 1 | 2 | 3 | 4 | 5;
 
@@ -29,13 +49,24 @@ export interface iScaleString {
   shift?: boolean;
 }
 
-export type tScaleType = 'major' | 'dorian' | 'phrygian' | 'lydian' | 'mixolydian' | 'minor' | 'locrian'; 
-export type tInterval = 2 | 3 | 4 | 5 | 6 | 7 | 8
-export type tColorType = ColorPickerChangeEvent['value'];
-
 export interface iCreateScale {
   scaleType: tScaleType;
   noteColor: tColorType;
+}
+
+export interface iScaleSelectItems {
+  name: string;
+  value: tScaleType;
+}
+
+// Interval Types
+export type tInterval = 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+export type tNoteType = 'root' | 'interval' | 'unison';
+
+export interface iColor {
+  color: tColorType;
+  setColor: Dispatch<SetStateAction<tColorType>>;
 }
 
 export interface iCreateInterval {
@@ -51,13 +82,6 @@ export interface iCreateInterval {
   }
 }
 
-export type tNoteType = 'root' | 'interval' | 'unison';
-
-export interface iColor {
-  color: tColorType;
-  setColor: Dispatch<SetStateAction<tColorType>>
-}
-
 /** strings can be colors as css would allow */
 export interface iIntervalColors {
   /** @default #a78bfa  for root.color */
@@ -68,19 +92,12 @@ export interface iIntervalColors {
   unison: iColor;
 }
 
-export interface iFretboardConfig {
-  /** @default 700 Width of fretboard in px */
-  width: number;
-  /** @default 200 Height of fretboard in px */
-  height: number;
-  /** @default 6 Number of frets to display */
-  numFrets: number;
-  /** @default 4 Number of strings to display */
-  numStrings: number;
-  /** @default 8 Radius of fretpoint dot in px */
-  fretpointRadius: number;
+export interface iIntervalSelectItems {
+  name: string;
+  value: tInterval;
 }
 
+// Controls Types
 export interface iControlsContext {
   /** @default 2 */
   interval: tInterval;
@@ -106,17 +123,19 @@ export interface iControlProps {
   elements: ReactNode[] | iControlElementGroups[];
 }
 
-export interface iIntervalSelectItems {
-  name: string;
-  value: tInterval;
-}
-
-export interface iScaleSelectItems {
-  name: string;
-  value: tScaleType;
-}
-
+// Metronome Types
 export type tSubdivision = 0.25 | 0.5 | 1 | 2 | 4;
+
+export interface iSubdivisionMenu {
+  name: string;
+  value: tSubdivision;
+}
+
+export interface iTimeSigMenu {
+  name: string;
+  /** Full time signature string, e.g. "4/4". Numerator is parsed for bpMeasure. */
+  value: string;
+}
 
 export interface iMetronome {
   bpm: number;

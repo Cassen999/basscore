@@ -59,41 +59,31 @@ export const Home = () => {
             Don't be a baby, learn bass guitar with BASSCORE
           </h1>
           <div className="hero-subtitle">
-            <p className="hero-subtitle-text">
-              Join these famous bassists who also got gud with BASSCORE:
+            <p>
+              Join these famous bassists who also got gud with BASSCORE:{' '}
+              <Tooltip
+                target=".jaco"
+                content="Definitely a lie but he for sure would have."
+                mouseTrack
+                mouseTrackLeft={10}
+              />
+              <span className="underline jaco">Jaco Pastorius</span>,{' '}
+              <Tooltip
+                target=".flea"
+                content="Also a lie. Honestly he probably wouldn't."
+                mouseTrack
+                mouseTrackLeft={10}
+              />
+              <span className="underline flea">Flea</span>,{' '}
+              and{' '}
+              <Tooltip
+                target=".cassen"
+                content="Not famous but he made this thing."
+                mouseTrack
+                mouseTrackLeft={10}
+              />
+              <span className="underline cassen">Cassen Gerber</span>
             </p>
-            <ul className="hero-list">
-              <li>
-                <Tooltip
-                  target=".jaco"
-                  content="Definitely a lie but he for sure would have."
-                  mouseTrack
-                  mouseTrackLeft={10}
-                />
-                <p className="underline jaco">Jaco Pastorius,</p>
-              </li>
-              <li>
-                <Tooltip
-                  target=".flea"
-                  content="Also a lie. Honestly he probably wouldn't."
-                  mouseTrack
-                  mouseTrackLeft={10}
-                />
-                <p className="underline flea">Flea,</p>
-              </li>
-              <li>
-                <span className='li-one-line'>
-                  <p>and&nbsp;</p>
-                  <Tooltip
-                    target=".cassen"
-                    content="Not famous but he made this thing."
-                    mouseTrack
-                    mouseTrackLeft={10}
-                  />
-                  <p className="underline cassen">Cassen Gerber</p>
-                </span>
-              </li>
-            </ul>
           </div>
         </div>
       </section>

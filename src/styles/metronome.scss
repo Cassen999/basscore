@@ -1,12 +1,16 @@
+// Rule: always use rem over px unless there is a clear advantage to using px
+@use 'sass:map';
+@use './variables.scss' as *;
 
 @keyframes dotFlash {
-  0%   { opacity: 1; box-shadow: 0 0 10px var(--primary-color); }
+  0%   { opacity: 1; box-shadow: 0 0 0.625rem var(--primary-color); }
   100% { opacity: 0.85; box-shadow: none; }
 }
 
 .metronome-container {
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: fit-content;
   gap: 2rem;
 
@@ -39,24 +43,26 @@
     align-items: center;
     gap: 2rem;
     width: 100%;
+
   }
+
   .beat-dots-container {
     width: 100%;
   }
-  
+
   .beat-dots-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 0.5rem;
     width: 100%;
   }
-  
+
   .beat-dot {
-    height: 24px;
-    border-radius: 6px;
+    height: 1.5rem;
+    border-radius: 0.375rem;
     border: 2px solid var(--primary-color);
     background-color: transparent;
-  
+
     &--active {
       background-color: var(--primary-color);
       animation: dotFlash 0.3s ease-out forwards;
@@ -66,5 +72,34 @@
   .start-metronome-btn {
     width: 100%;
   }
-}
 
+  @media (min-width: #{map.get($breakpoints, 'lg')}) {
+    width: auto;
+
+    .metronome-play-section {
+      width: auto;
+    }
+  }
+
+  @media (max-width: #{map.get($breakpoints, 'md')}) {
+    .metronome-controls-container {
+      flex-direction: column;
+
+      .metronome-controls {
+        flex-direction: column;
+      }
+
+      .volume-slider {
+        width: 100%;
+
+        .p-slider {
+          width: 100%;
+        }
+      }
+    }
+
+    .beat-dots-grid {
+      grid-template-columns: repeat(auto-fit, minmax(2.5rem, 1fr));
+    }
+  }
+}
