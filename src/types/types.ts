@@ -121,3 +121,14 @@ export interface iScaleSelectItems {
   name: string;
   value: tScaleType;
 }
+
+export type tSubdivision = 0.25 | 0.5 | 1 | 2 | 4;
+
+export interface iMetronome {
+  bpm: number;
+  subdivision: tSubdivision;
+  isPlaying: boolean;
+  volume: number;
+  /** Number of beats per measure (numerator of time signature) */
+  bpMeasure: number;
+}

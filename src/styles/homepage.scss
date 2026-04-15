@@ -2,7 +2,8 @@
 @use "./variables.scss" as *;
 
 .app-container {
-  min-height: 100dvh;
+  overflow: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   main {
@@ -86,6 +87,66 @@
     }
     &.p-focus .p-menuitem-content {
       background-color: $overlay-hover;
+    }
+  }
+}
+
+.home-container {
+  .offerings-cards {
+    display: flex;
+    gap: 2rem;
+    margin: 0 3rem 2rem 3rem;
+
+    .p-card {
+      flex: 1;
+    }
+
+    .p-card-header {
+      display: flex;
+      justify-content: center;
+      img {
+        height: 200px;
+        width: auto;
+      }
+    }
+
+    .p-card-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+
+  .hero {
+    margin-bottom: 2rem;
+  }
+
+  .hero-title {
+    margin-bottom: 0;
+  }
+
+  .hero-subtitle {
+    display: flex;
+    flex-direction: row;
+    .hero-subtitle-text {
+      margin: .5rem .5rem 0 0;
+    }
+  }
+  .hero-list {
+    list-style: none;
+    width: fit-content;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    gap: .5rem;
+    .li-one-line {
+      display: flex;
+      flex-direction: row;
+    }
+    li {
+      display: inline;
+      p {
+        margin: .5rem 0 0 0;
+      }
     }
   }
 }

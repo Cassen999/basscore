@@ -1,23 +1,70 @@
+
+@keyframes dotFlash {
+  0%   { opacity: 1; box-shadow: 0 0 10px var(--primary-color); }
+  100% { opacity: 0.85; box-shadow: none; }
+}
+
 .metronome-container {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: column;
   height: fit-content;
   gap: 2rem;
-  .start-metronome-btn {
+
+  .metronome-controls-container {
     display: flex;
-    align-items: center;
+    gap: 2rem;
+
+    .metronome-controls {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+    }
+
+    .bpm-inputnumber,
+    .subdivision-input,
+    .time-sig-input {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .volume-slider {
+      height: fit-content;
+    }
   }
-  .metronome {
+
+  .metronome-play-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 15rem;
-    margin-top: 1rem;
-    span {
-      margin-bottom: 1rem;
-    }
-    .p-slider {
-      width: 100%;
+    gap: 2rem;
+    width: 100%;
+  }
+  .beat-dots-container {
+    width: 100%;
+  }
+  
+  .beat-dots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .beat-dot {
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid var(--primary-color);
+    background-color: transparent;
+  
+    &--active {
+      background-color: var(--primary-color);
+      animation: dotFlash 0.3s ease-out forwards;
     }
   }
+
+  .start-metronome-btn {
+    width: 100%;
+  }
 }
+
