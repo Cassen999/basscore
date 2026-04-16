@@ -50,6 +50,10 @@
     justify-content: center;
     .logo {
       width: 31.25rem;
+
+      @media (max-width: #{map.get($breakpoints, 'sm')}) {
+        width: 23.90625rem;
+      }
     }
   }
 
