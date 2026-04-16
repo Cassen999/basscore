@@ -6,12 +6,12 @@ import Footer from "../components/Footer";
 export const HomeContainer = () => {
   return (
     <div className="app-container">
-      <Header />
-      <main className="main-section">
-        <ControlsProvider>
+      <ControlsProvider>
+        <Header />
+        <main className="main-section">
           <Outlet />
-        </ControlsProvider>
-      </main>
+        </main>
+      </ControlsProvider>
       <Footer />
     </div>
   );

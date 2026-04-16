@@ -10,6 +10,16 @@ import type {
 import { ColorPicker } from "primereact/colorpicker";
 import { useEffect, type ReactNode } from "react";
 
+const scaleOptions: iScaleSelectItems[] = [
+  { name: "Major", value: "major" },
+  { name: "Dorian", value: "dorian" },
+  { name: "Phrygian", value: "phrygian" },
+  { name: "Lydian", value: "lydian" },
+  { name: "Mixolydian", value: "mixolydian" },
+  { name: "Minor", value: "minor" },
+  { name: "Locrian", value: "locrian" },
+];
+
 export const Scales = () => {
   const {
     scaleNoteColor,
@@ -36,16 +46,6 @@ export const Scales = () => {
   };
 
   const scaleSelect = () => {
-    const scaleOptions: iScaleSelectItems[] = [
-      { name: "Major", value: "major" },
-      { name: "Minor", value: "minor" },
-      { name: "Dorian", value: "dorian" },
-      { name: "Locrian", value: "locrian" },
-      { name: "Lydian", value: "lydian" },
-      { name: "Mixolydian", value: "mixolydian" },
-      { name: "Phrygian", value: "phrygian" },
-    ];
-
     return (
       <div className="interval-select">
         <SelectButton
@@ -69,12 +69,14 @@ export const Scales = () => {
     },
   ];
 
+  const activeScaleIndex = scaleOptions.findIndex(s => s.value === displayedScales);
+
   return (
     <div className="scales-container">
       <h1 className="page-title">Scales and Positions</h1>
 
       <div className='scale-page-section'>
-        <div className="page-subsection">
+        <div className="page-subsection fretboard-controls-panel">
           <ControlPanel
             cardProps={{
               header: "Fretboard Controls",
@@ -84,7 +86,7 @@ export const Scales = () => {
         </div>
 
         <div className="page-subsection">
-          <h2 className="page-subtitle">Major (Position 1)</h2>
+          <h2 className="page-subtitle">{scaleOptions[activeScaleIndex].name} (Position {activeScaleIndex + 1})</h2>
           <Fretboard
             coords={createScale({
               scaleType: displayedScales,

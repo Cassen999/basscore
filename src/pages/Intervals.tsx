@@ -127,7 +127,7 @@ export const Intervals = () => {
       <h1 className="page-title">Intervals</h1>
 
       <div className="intervals-page-section">
-        <div className="page-subsection">
+        <div className="page-subsection fretboard-controls-panel">
           <ControlPanel
             cardProps={{
               header: "Fretboard Controls",

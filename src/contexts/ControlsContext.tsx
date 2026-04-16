@@ -35,7 +35,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
     numFrets: 5,
     numStrings: 4,
     fretpointRadius: 8,
-  })
+  });
 
   const intervalColors: iIntervalColors = {
     root: {
