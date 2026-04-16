@@ -6,6 +6,7 @@ import { Menubar } from 'primereact/menubar';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
+import SidebarControls from './SidebarControls';
 
 export const Header = () => {
   const nav = useNavigate();
@@ -54,6 +55,7 @@ export const Header = () => {
             </button>
           ))}
         </nav>
+        <SidebarControls />
         <div className='nav-sidebar__img-container'>
           <img src='images/bass-guitar.png' alt='Bass guitar' className='nav-sidebar__img' />
         </div>

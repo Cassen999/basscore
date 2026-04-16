@@ -79,8 +79,13 @@
     display: flex;
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
     padding: 0 3rem 0;
+
+    @media (max-width: #{map.get($breakpoints, 'md')}) {
+      padding: 0 1rem 0;
+    }
     &::-webkit-scrollbar {
       width: 8px;
     }
@@ -97,8 +102,8 @@
 }
 
 .p-menubar {
-  background: $overlays;
-  border: $overlays;
+  background: $overlay-1;
+  border: $overlay-1;
   .p-menuitem {
     :hover {
       background-color: $overlay-hover;
@@ -112,11 +117,11 @@
 
 .nav-sidebar {
   &.p-sidebar {
-    background: $overlays;
+    background: $overlay-1;
   }
 
   .p-sidebar-header {
-    background: $overlays;
+    background: $overlay-1;
 
     .p-sidebar-close {
       &:active,
@@ -190,6 +195,7 @@
       img {
         height: 12.5rem;
         width: auto;
+        max-width: 100%;
       }
     }
 
@@ -209,6 +215,7 @@
     @media (max-width: #{map.get($breakpoints, 'md')}) {
       flex-direction: column;
       align-items: center;
+      margin: 0 0 2rem 0;
 
       .p-card {
         flex: 0 0 auto;

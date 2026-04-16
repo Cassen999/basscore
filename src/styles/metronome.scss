@@ -82,6 +82,10 @@
   }
 
   @media (max-width: #{map.get($breakpoints, 'md')}) {
+    .start-metronome-btn {
+      margin-bottom: 2rem;
+    }
+
     .metronome-controls-container {
       flex-direction: column;
 

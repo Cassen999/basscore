@@ -1,3 +1,6 @@
+@use 'sass:map';
+@use './variables.scss' as *;
+
 .scales-container {
   width: 100%;
   gap: 2rem;
@@ -8,5 +11,15 @@
     justify-content: space-between;
     padding-left: 2rem;
     padding-right: 2rem;
+  }
+
+  @media (max-width: #{map.get($breakpoints, 'md')}) {
+    .fretboard-controls-panel {
+      display: none;
+    }
+
+    .scale-page-section {
+      justify-content: center;
+    }
   }
 }

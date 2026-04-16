@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { Tooltip } from "primereact/tooltip";
+import BCTooltip from "../components/BCTooltip";
 import type { JSX } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -61,27 +61,12 @@ export const Home = () => {
           <div className="hero-subtitle">
             <p>
               Join these famous bassists who also got gud with BASSCORE:{' '}
-              <Tooltip
-                target=".jaco"
-                content="Definitely a lie but he for sure would have."
-                mouseTrack
-                mouseTrackLeft={10}
-              />
+              <BCTooltip target=".jaco" content="Definitely a lie but he for sure would have." mouseTrack mouseTrackLeft={10} />
               <span className="underline jaco">Jaco Pastorius</span>,{' '}
-              <Tooltip
-                target=".flea"
-                content="Also a lie. Honestly he probably wouldn't."
-                mouseTrack
-                mouseTrackLeft={10}
-              />
+              <BCTooltip target=".flea" content="Also a lie. Honestly he probably wouldn't." mouseTrack mouseTrackLeft={10} />
               <span className="underline flea">Flea</span>,{' '}
               and{' '}
-              <Tooltip
-                target=".cassen"
-                content="Not famous but he made this thing."
-                mouseTrack
-                mouseTrackLeft={10}
-              />
+              <BCTooltip target=".cassen" content="Not famous but he made this thing." mouseTrack mouseTrackLeft={10} />
               <span className="underline cassen">Cassen Gerber</span>
             </p>
           </div>

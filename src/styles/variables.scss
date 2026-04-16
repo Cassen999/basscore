@@ -8,11 +8,18 @@ $colors: (
   'gray300': #868686,
   'gray400': #5E5E5E,
   'gray600': #2B2B2B,
+  'gray650': #262626,
   'gray700': #202020,
   'gray750': #181818,
   'gray800': #161616,
   'gray850': #101010,
   'gray900': #0B0B0B,
+);
+
+$overlay-colors: (
+  'level1': map.get($colors, 'gray850'),
+  'level2': map.get($colors, 'gray750'),
+  'level3': map.get($colors, 'gray650'),
 );
 
 $breakpoints: (
@@ -28,7 +35,9 @@ $secondary-text: map.get($colors, 'gray200');
 
 // backgrounds
 $background: map.get($colors, 'gray700');
-$overlays: map.get($colors, 'gray850');
+$overlay-1: map.get($overlay-colors, 'level1');
+$overlay-2: map.get($overlay-colors, 'level2');
+$overlay-3: map.get($overlay-colors, 'level3');
 
 // hovers
 $overlay-hover: map.get($colors, 'gray600');

@@ -12,7 +12,7 @@ export const getY = (
   const { numStrings, height } = fretboardConfig;
 
   return (
-    margin + (numStrings - stringIndex) * ((height - 2 * margin) / numStrings)
+    margin + (numStrings - stringIndex) * ((height - 2 * margin) / (numStrings - 1))
   );
 };
 

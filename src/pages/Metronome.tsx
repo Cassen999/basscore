@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import type { tSubdivision } from "../types/types";
 import { Dropdown, type DropdownChangeEvent } from "primereact/dropdown";
 import { Button } from "primereact/button";
-import { Tooltip } from "primereact/tooltip";
+import BCTooltip from "../components/BCTooltip";
 import { Slider } from "primereact/slider";
 import { subdivisions, timeSignatures } from "../helpers/dataSets";
 
@@ -27,12 +27,7 @@ export const MetronomePage = () => {
     <div className="metronome-container">
       <div className="metronome-controls-container">
         <div className="metronome-controls">
-          <Tooltip
-            target=".bpm-inputnumber"
-            content="How many beats per measure?"
-            mouseTrack
-            mouseTrackLeft={10}
-          />
+          <BCTooltip target=".bpm-inputnumber" content="How many beats per measure?" mouseTrack mouseTrackLeft={10} />
           <label className="bpm-inputnumber">
             BPM
             <InputNumber
@@ -42,14 +37,10 @@ export const MetronomePage = () => {
               max={240}
               value={bpm}
               onValueChange={(e) => setBpm(e.value!!)}
+              inputMode="numeric"
             />
           </label>
-          <Tooltip
-            target=".subdivision-input"
-            content="What type of notes? Default is Quarter Note"
-            mouseTrack
-            mouseTrackLeft={10}
-          />
+          <BCTooltip target=".subdivision-input" content="What type of notes? Default is Quarter Note" mouseTrack mouseTrackLeft={10} />
           <label className="subdivision-input">
             Subdivision
             <Dropdown
@@ -64,12 +55,7 @@ export const MetronomePage = () => {
               placeholder="Subdivisions"
             />
           </label>
-          <Tooltip
-            target=".time-sig-input"
-            content="Time signature"
-            mouseTrack
-            mouseTrackLeft={10}
-          />
+          <BCTooltip target=".time-sig-input" content="Time signature" mouseTrack mouseTrackLeft={10} />
           <label className="time-sig-input">
             Time Signature
             <Dropdown
@@ -86,10 +72,7 @@ export const MetronomePage = () => {
           </label>
         </div>
         <div className="volume-slider">
-          <Tooltip
-            target=".volume-slider"
-            content={`Volume: ${volume}`}
-          />
+          <BCTooltip target=".volume-slider" content={`Volume: ${volume}`} />
           <Slider
             value={volume}
             onChange={(e) => {

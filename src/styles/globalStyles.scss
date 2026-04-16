@@ -1,8 +1,15 @@
 @use './variables.scss' as *;
 
 .p-inputtext, .p-dropdown, .p-dropdown-items {
-  background-color: $overlays;
-  border-color: $overlays;
+  background-color: $overlay-1;
+  border-color: $overlay-1;
+}
+
+// PrimeReact's default padding on .p-dropdown-items exposes the panel's background behind the items list.
+// Using margin instead keeps the items flush with the panel edges so the background is consistent.
+.p-dropdown-panel .p-dropdown-items {
+  padding: 0;
+  margin: 0.25rem 0;
 }
 
 .underline {

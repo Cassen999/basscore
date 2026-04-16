@@ -1,3 +1,4 @@
+@use 'sass:map';
 @use './variables.scss' as *;
 
 h1 {
@@ -12,5 +13,15 @@ h1 {
     justify-content: space-between;
     padding-left: 2rem;
     padding-right: 2rem;
+  }
+
+  @media (max-width: #{map.get($breakpoints, 'md')}) {
+    .fretboard-controls-panel {
+      display: none;
+    }
+
+    .intervals-page-section {
+      justify-content: center;
+    }
   }
 }
