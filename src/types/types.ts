@@ -145,3 +145,31 @@ export interface iMetronome {
   /** Number of beats per measure (numerator of time signature) */
   bpMeasure: number;
 }
+
+// Timer Types
+/** 'idle' = not started or stopped; 'running' = counting; 'paused' = mid-session hold */
+export type tTimerStatus = 'idle' | 'running' | 'paused';
+
+export interface iTimerContext {
+  /** Countdown duration in seconds selected by the user. null = no limit (stopwatch mode). */
+  duration: number | null;
+  setDuration: Dispatch<SetStateAction<number | null>>;
+  /** Milliseconds accumulated before the current run started. Resets to 0 on restart/stop. */
+  accumulated: number;
+  /** Date.now() timestamp when the timer was last started or resumed. null when not running. */
+  startedAt: number | null;
+  /** Remaining milliseconds, updated on a 100ms interval while running */
+  displayMs: number;
+  /** Remaining time formatted as MM:SS */
+  formattedTime: string;
+  isRunning: boolean;
+  status: tTimerStatus;
+  /** Start or resume the timer */
+  start: () => void;
+  /** Pause without resetting elapsed time */
+  pause: () => void;
+  /** Reset elapsed time and begin counting immediately */
+  restart: () => void;
+  /** Stop and reset to idle */
+  stop: () => void;
+}

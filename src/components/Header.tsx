@@ -1,22 +1,47 @@
 // Rule: always use single quotes over double quotes unless double quotes are necessary
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { MenuItem } from 'primereact/menuitem';
+import type { MenuItemOptions } from 'primereact/menuitem';
 import Logo from '../assets/logo.png';
 import { Menubar } from 'primereact/menubar';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 import SidebarControls from './SidebarControls';
+import { Timer } from './Timer';
+import { useTimer } from '../contexts/TimerContext';
 
 export const Header = () => {
   const nav = useNavigate();
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [timerVisible, setTimerVisible] = useState(false);
+  const [timerAnchorRect, setTimerAnchorRect] = useState<DOMRect | null>(null);
+  const timerBtnRef = useRef<HTMLButtonElement>(null);
+
+  const { isRunning, formattedTime } = useTimer();
 
   const items: MenuItem[] = [
     { label: 'Home', command: () => nav('/home') },
     { label: 'Metronome', command: () => nav('/metronome') },
     { label: 'Scales', command: () => nav('/scales') },
     { label: 'Intervals', command: () => nav('/intervals') },
+    {
+      label: 'Timer',
+      template: (_item: MenuItem, options: MenuItemOptions) => (
+        <button
+          ref={timerBtnRef}
+          className={`${options.className} timer-menu-btn`}
+          onClick={() => {
+            setTimerAnchorRect(timerBtnRef.current?.getBoundingClientRect() ?? null);
+            setTimerVisible((v) => !v);
+          }}
+        >
+          <span className={options.labelClassName}>
+            Timer{isRunning && !timerVisible && ` - ${formattedTime}`}
+          </span>
+        </button>
+      ),
+    },
   ];
 
   const navItems = [
@@ -66,6 +91,11 @@ export const Header = () => {
       <div className='menubar-container'>
         <Menubar model={items} />
       </div>
+      <Timer
+        visible={timerVisible}
+        onHide={() => setTimerVisible(false)}
+        anchorRect={timerAnchorRect}
+      />
     </div>
   );
 };
