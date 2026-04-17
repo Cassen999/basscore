@@ -90,12 +90,13 @@ const SidebarControls = () => {
             onChange={(e) => intervalColors.interval.setColor(`#${e.value}`)}
           />
         </div>
-        <div className='sidebar-controls__group'>
+        <div className='sidebar-controls__group unison'>
           <span className='sidebar-controls__label'>Unison</span>
           <ColorPicker
             value={intervalColors.unison.color as string}
             onChange={(e) => intervalColors.unison.setColor(`#${e.value}`)}
           />
+          <span className='sidebar-controls__label unison-switch-label'>{showUnison ? 'Hide' : 'Show'} Unison</span>
           <InputSwitch
             aria-label='Show/Hide Unison Note'
             checked={showUnison}
