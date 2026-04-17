@@ -14,6 +14,8 @@ export const Metronome = (props: iMetronome) => {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<number | null>(null);
   let gainRef = useRef<GainNode | null>(null);
+  const kickBufferRef = useRef<AudioBuffer | null>(null);
+  const hiHatBufferRef = useRef<AudioBuffer | null>(null);
   let gainNode: GainNode | null = null;
   let ctx: AudioContext | null = null;
 
@@ -32,6 +34,12 @@ export const Metronome = (props: iMetronome) => {
     audioCtxRef.current = ctx;
     gainRef.current = gainNode;
 
+    const loadBuffer = (path: string) =>
+      fetch(path).then((res) => res.arrayBuffer()).then((data) => ctx!.decodeAudioData(data));
+
+    loadBuffer("./sounds/soft-kick.wav").then((buffer) => { kickBufferRef.current = buffer; });
+    loadBuffer("./sounds/closed-hi-hat.wav").then((buffer) => { hiHatBufferRef.current = buffer; });
+
     return () => {
       ctx?.close();
     };
@@ -44,24 +52,14 @@ export const Metronome = (props: iMetronome) => {
 
     const currentCount: number = beatCountRef.current;
     const isDownbeat: boolean = currentCount % dotCountRef.current === 0;
+    const buffer = isDownbeat ? kickBufferRef.current : hiHatBufferRef.current;
 
-    const oscillator = ctx.createOscillator();
-    oscillator.type = "square";
-    oscillator.frequency.value = isDownbeat ? 500 : 400;
+    if (!buffer) return;
 
-    const sliderGain = ctx.createGain();
-
-    // Connect oscillator to gain node and gain node to context
-    oscillator.connect(sliderGain);
-    sliderGain.connect(masterGain);
-    masterGain.connect(ctx.destination);
-
-    // Set gain node volume
-    sliderGain.gain.setValueAtTime(volume, ctx.currentTime);
-    sliderGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.05);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(masterGain);
+    source.start();
 
     const nextCount: number = currentCount + 1;
     beatCountRef.current = nextCount;
