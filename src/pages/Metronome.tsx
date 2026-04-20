@@ -75,10 +75,7 @@ export const MetronomePage = () => {
           <BCTooltip target=".volume-slider" content={`Volume: ${volume}`} />
           <Slider
             value={volume}
-            onChange={(e) => {
-              console.log("e", e.value);
-              setVolume(e.value as number);
-            }}
+            onChange={(e) => setVolume(e.value as number)}
             orientation={isMd ? 'horizontal' : 'vertical'}
             min={0}
             max={100}

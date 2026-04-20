@@ -1,0 +1,218 @@
+// Rule: always use rem over px unless there is a clear advantage to using px
+@use 'sass:map';
+@use './variables.scss' as *;
+
+// Timer menu button — reset browser <button> defaults and suppress PrimeReact
+// hover/focus backgrounds so only the cursor and text styling remain.
+// :focus-visible preserves keyboard focus visibility (WCAG 2.4.7 / 2.4.11).
+.timer-menu-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover,
+  &:active {
+    background: transparent;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+}
+
+// Override the .p-menubar .p-menuitem :hover background that would otherwise
+// apply to any descendant on hover (higher specificity than the source rule).
+.p-menubar .p-menuitem .timer-menu-btn:hover {
+  background: transparent;
+}
+
+.p-menubar .p-menuitem:has(.timer-menu-btn).p-focus .p-menuitem-content {
+  background: transparent;
+}
+
+// Override to slide from top.
+.p-dialog-top-left:has(.timer-dialog) {
+  .p-dialog-enter {
+    opacity: 0;
+    transform: translate3d(0, -0.5rem, 0);
+  }
+
+  .p-dialog-enter-active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  }
+
+  .p-dialog-exit-active {
+    opacity: 0;
+    transform: translate3d(0, -0.5rem, 0);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  }
+}
+
+.sidebar-timer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid map.get($colors, 'gray600');
+
+  @media (min-width: #{map.get($breakpoints, 'lg')}) {
+    display: none;
+  }
+
+  &__panel {
+    &.p-panel {
+      background: transparent;
+      border: none;
+    }
+
+    .p-panel-header {
+      background: transparent;
+      border: none;
+      padding: 0.5rem 0;
+      color: $secondary-text;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .p-panel-content {
+      background: transparent;
+      border: none;
+      padding: 0.75rem 0 0;
+    }
+
+    .p-panel-toggler {
+      color: $secondary-text;
+      width: 1.25rem;
+      height: 1.25rem;
+
+      &:focus,
+      &.p-focus {
+        box-shadow: none;
+        background: transparent;
+      }
+
+      &:hover {
+        background: transparent;
+        color: $primary-text;
+      }
+    }
+  }
+}
+
+.timer-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+
+  &__display {
+    display: flex;
+    align-items: center;
+  }
+
+  &__input-field {
+    background: transparent;
+    border: none;
+    color: $primary-text;
+    font-size: 3rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    width: 3ch;
+    padding: 0;
+    line-height: 1;
+
+    &:enabled:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+      border-radius: 0.25rem;
+      box-shadow: none;
+    }
+
+    &:disabled {
+      opacity: 1;
+      cursor: default;
+    }
+  }
+
+  &__colon {
+    font-size: 3rem;
+    line-height: 1;
+    padding: 0 0.1em;
+    user-select: none;
+  }
+
+  &__pills {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__pill {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: $primary-text;
+    border-radius: 999rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8125rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $overlay-hover;
+    }
+  }
+
+  &__start-stop {
+    width: 100%;
+  }
+
+  &__secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  &__secondary-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid $overlay-hover;
+    color: $primary-text;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0;
+    font-size: 0.8125rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: $overlay-hover;
+    }
+
+    &:disabled {
+      color: $overlay-hover;
+      cursor: default;
+    }
+  }
+}
+
+.timer-dialog {
+  translate: -50% 0;
+
+  .p-dialog-content {
+    background: $overlay-1;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+}

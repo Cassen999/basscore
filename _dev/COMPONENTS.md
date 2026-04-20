@@ -42,6 +42,22 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 
 ---
 
+### `Timer`
+**File:** `src/components/Timer.tsx`
+**Props:** `iTimerDialogProps` — `visible`, `onHide`, `anchorRect: DOMRect | null`
+**Export:** `export const Timer`
+**Purpose:** Dialog wrapper that positions `TimerControls` as a floating panel anchored to the header menubar button. Desktop only — hidden via CSS on md and lower.
+
+---
+
+### `TimerControls`
+**File:** `src/components/TimerControls.tsx`
+**Props:** none
+**Export:** `export const TimerControls`
+**Purpose:** Self-contained timer UI (time inputs, pill buttons, start/stop, reset, clear). Reads/writes shared timer state via `useTimer()`. Manages its own local reset-tracking state (`startDuration`, `pillTotal`). Used by `Timer` (dialog) and inline in the sidebar.
+
+---
+
 ### `Header`
 **File:** `src/components/Header.tsx`
 **Props:** none
