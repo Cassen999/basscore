@@ -17,14 +17,9 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
   const [accumulated, setAccumulated] = useState<number>(0);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [status, setStatus] = useState<tTimerStatus>('idle');
-  const [displayMs, setDisplayMs] = useState<number>(0);
-  const [formattedTime, setFormattedTime] = useState<string>('');
+  const [displayMs, setDisplayMs] = useState<number>(0); // internal only — not exposed in context
 
   const pad = (n: number) => String(n).padStart(2, '0');
-
-  useEffect(() => {
-    setFormattedTime(`${pad(Math.floor(displayMs / 60000))}:${pad(Math.floor((displayMs % 60000) / 1000))}`);
-  }, [displayMs])
 
   // Mirror of startedAt as a ref so pause() can read the current value
   // synchronously without doubling accummulator in strict mode
@@ -50,9 +45,9 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const pause = useCallback(() => {
-    const now = Date.now();
-    setAccumulated((acc) => acc + (startedAtRef.current !== null ? now - startedAtRef.current : 0));
+    const elapsed = startedAtRef.current !== null ? Date.now() - startedAtRef.current : 0;
     startedAtRef.current = null;
+    setAccumulated((acc) => acc + elapsed);
     setStartedAt(null);
     setStatus('paused');
   }, []);
@@ -77,10 +72,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
       duration,
       setDuration,
       accumulated,
-      startedAt,
-      displayMs,
-      formattedTime,
-      isRunning: status === 'running',
+      formattedTime: `${pad(Math.floor(displayMs / 60000))}:${pad(Math.floor((displayMs % 60000) / 1000))}`,
       status,
       start,
       pause,

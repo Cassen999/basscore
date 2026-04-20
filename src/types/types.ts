@@ -156,13 +156,8 @@ export interface iTimerContext {
   setDuration: Dispatch<SetStateAction<number | null>>;
   /** Milliseconds accumulated before the current run started. Resets to 0 on restart/stop. */
   accumulated: number;
-  /** Date.now() timestamp when the timer was last started or resumed. null when not running. */
-  startedAt: number | null;
-  /** Remaining milliseconds, updated on a 100ms interval while running */
-  displayMs: number;
   /** Remaining time formatted as MM:SS */
   formattedTime: string;
-  isRunning: boolean;
   status: tTimerStatus;
   /** Start or resume the timer */
   start: () => void;
@@ -172,4 +167,11 @@ export interface iTimerContext {
   restart: () => void;
   /** Stop and reset to idle */
   stop: () => void;
+}
+
+export interface iTimerDialogProps {
+  visible: boolean;
+  onHide: () => void;
+  /** Bounding rect of the trigger button — used to anchor the dialog position */
+  anchorRect: DOMRect | null;
 }

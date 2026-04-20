@@ -6,9 +6,11 @@ import Logo from '../assets/logo.png';
 import { Menubar } from 'primereact/menubar';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
+import { Panel } from 'primereact/panel';
 import { useNavigate } from 'react-router-dom';
 import SidebarControls from './SidebarControls';
 import { Timer } from './Timer';
+import { TimerControls } from './TimerControls';
 import { useTimer } from '../contexts/TimerContext';
 
 export const Header = () => {
@@ -18,7 +20,7 @@ export const Header = () => {
   const [timerAnchorRect, setTimerAnchorRect] = useState<DOMRect | null>(null);
   const timerBtnRef = useRef<HTMLButtonElement>(null);
 
-  const { isRunning, formattedTime } = useTimer();
+  const { status, formattedTime } = useTimer();
 
   const items: MenuItem[] = [
     { label: 'Home', command: () => nav('/home') },
@@ -37,7 +39,7 @@ export const Header = () => {
           }}
         >
           <span className={options.labelClassName}>
-            Timer{isRunning && !timerVisible && ` - ${formattedTime}`}
+            Timer{status === 'running' && !timerVisible && ` - ${formattedTime}`}
           </span>
         </button>
       ),
@@ -80,6 +82,11 @@ export const Header = () => {
             </button>
           ))}
         </nav>
+        <div className='sidebar-timer'>
+          <Panel header='Timer' toggleable collapsed className='sidebar-timer__panel'>
+            <TimerControls />
+          </Panel>
+        </div>
         <SidebarControls />
         <div className='nav-sidebar__img-container'>
           <img src='images/bass-guitar.png' alt='Bass guitar' className='nav-sidebar__img' />
