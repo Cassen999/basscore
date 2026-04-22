@@ -1,8 +1,18 @@
 @use './variables.scss' as *;
 
+// Utilities
+.underline {
+  text-decoration: underline;
+}
+
+// PrimeReact overrides
 .p-inputtext, .p-dropdown, .p-dropdown-items {
   background-color: $overlay-1;
   border-color: $overlay-1;
+}
+
+.pi {
+  font-family: 'primeicons' !important;
 }
 
 // PrimeReact's default padding on .p-dropdown-items exposes the panel's background behind the items list.
@@ -20,6 +30,6 @@
   border-color: var(--purple-900);
 }
 
-.underline {
-  text-decoration: underline;
+.p-card {
+  background: $overlay-1;
 }

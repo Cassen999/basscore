@@ -4,10 +4,6 @@
   font-family: 'SpaceGrotesk', sans-serif !important;
 }
 
-.pi {
-  font-family: 'primeicons' !important;
-}
-
 html,
 body {
   height: 100%;
@@ -37,10 +33,6 @@ h4 {
 p {
   font-size: clamp(1rem, 0.5vw, 1.0625rem);
   line-height: 1.6;
-}
-
-.p-card {
-  background: $overlay-1;
 }
 
 :root {
