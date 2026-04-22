@@ -21,7 +21,7 @@ The full architecture and component registry live in `_dev/`. Read those files b
 - All shared types go in `src/types/types.ts`
 - Local-only types are defined at the top of the file that uses them
 - Use `interface` for object shapes (prefixed `i`), `type` for unions and aliases (prefixed `t`)
-- Add JSDoc comments with `@default` tags on interface properties
+- Every interface property that has a default value **must** include a `/** @default <value> */` JSDoc comment on the same line or the line above. This applies to all new types and any existing type you edit. Example: `/** @default 4 */ numStrings: number;`
 - Use `import type` syntax for type-only imports
 
 ---
@@ -91,3 +91,11 @@ Do not silently comply with something that violates best practices.
 - Don't add comments unless the logic isn't self-evident
 - Don't add error handling for scenarios that can't happen
 - Keep responses short and direct
+
+## Edge Case Handling
+
+When an edge case is encountered that is not explicitly defined in the plan or feature spec:
+
+- **Prefer non-destructive behavior** — do not remove, mutate, or overwrite existing data unless the feature explicitly requires it
+- **Do not mutate existing coords** unless explicitly instructed
+- **Log a warning in development** using `if (import.meta.env.DEV) console.warn(...)` so edge cases are visible during development without polluting production output
