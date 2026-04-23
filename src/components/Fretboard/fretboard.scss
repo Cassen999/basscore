@@ -1,0 +1,38 @@
+@use 'sass:map';
+@use '../../styles/variables.scss' as *;
+
+.fret-lines {
+  stroke: map.get($colors, 'gray200');
+}
+
+.string-lines {
+  stroke: map.get($colors, 'gray200');
+}
+
+.fretboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__label {
+    display: none;
+    color: $secondary-text;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: #{map.get($breakpoints, 'md')}) {
+    &__label {
+      display: block;
+    }
+
+    svg {
+      // rotate(90deg): visual becomes 200w × 700h, layout box stays 700w × 200h
+      // scale(0.5): visual becomes 100w × 350h, layout box stays 700w × 200h
+      // margin compensates: vertical +75px each side, horizontal -300px each side
+      transform: rotate(90deg) scale(0.5);
+      margin: 75px -300px;
+    }
+  }
+}

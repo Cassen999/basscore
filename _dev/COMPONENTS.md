@@ -7,7 +7,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ## UI Components
 
 ### `Fretboard`
-**File:** `src/components/Fretboard.tsx`
+**File:** `src/components/Fretboard/Fretboard.tsx`
 **Props:** `iFretboardProps` (optional `coords: iCoords[]`)
 **Export:** `export default Fretboard`
 **Purpose:** Renders an SVG bass guitar fretboard. Reads fretboard dimensions and string/fret count from `ControlsContext` via `useControls()`. Accepts an array of coordinate objects to render colored dot markers on the fretboard.
@@ -19,7 +19,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `ControlPanel`
-**File:** `src/components/ControlPanel.tsx`
+**File:** `src/components/ControlPanel/ControlPanel.tsx`
 **Props:** `iControlProps` — `elements: ReactNode[] | iControlElementGroups[]`, optional `cardProps`
 **Export:** `export default ControlPanel`
 **Purpose:** A PrimeReact `Card` wrapper that renders grouped or flat lists of control elements (dropdowns, sliders, color pickers, etc.).
@@ -30,7 +30,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `Metronome`
-**File:** `src/components/Metronome.tsx`
+**File:** `src/components/Metronome/Metronome.tsx`
 **Props:** `iMetronome` — `bpm`, `subdivision: tSubdivision`, `isPlaying`, `volume`, `bpMeasure`
 **Export:** `export const Metronome`
 **Purpose:** Handles all Web Audio API logic (oscillator, gain, interval timer) and renders the beat dot visual. The beat dots reflect the active beat in sync with the audio click.
@@ -43,7 +43,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `Timer`
-**File:** `src/components/Timer.tsx`
+**File:** `src/components/Timer/Timer.tsx`
 **Props:** `iTimerDialogProps` — `visible`, `onHide`, `anchorRect: DOMRect | null`
 **Export:** `export const Timer`
 **Purpose:** Dialog wrapper that positions `TimerControls` as a floating panel anchored to the header menubar button. Desktop only — hidden via CSS on md and lower.
@@ -51,7 +51,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `TimerControls`
-**File:** `src/components/TimerControls.tsx`
+**File:** `src/components/Timer/TimerControls.tsx`
 **Props:** none
 **Export:** `export const TimerControls`
 **Purpose:** Self-contained timer UI (time inputs, pill buttons, start/stop, reset, clear). Reads/writes shared timer state via `useTimer()`. Manages its own local reset-tracking state (`startDuration`, `pillTotal`). Used by `Timer` (dialog) and inline in the sidebar.
@@ -59,7 +59,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `Header`
-**File:** `src/components/Header.tsx`
+**File:** `src/components/Header/Header.tsx`
 **Props:** none
 **Export:** `export const Header` (confirm on read — may be default)
 **Purpose:** Top navigation bar using PrimeReact `Menubar`. Contains links to all routes.
@@ -68,9 +68,23 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `Footer`
-**File:** `src/components/Footer.tsx`
+**File:** `src/components/Footer/Footer.tsx`
 **Props:** none
 **Purpose:** Simple copyright footer rendered by `HomeContainer`.
+
+---
+
+### `CustomFretboardEditor`
+**File:** `src/components/CustomFretboardEditor/CustomFretboardEditor.tsx`
+**Props:** `iCustomFretboardEditorProps` (local) — `coords`, `fretboardConfig`, `dragState`, `selectedDotId`, `svgRef`, `onCellClick`, `onDotMouseDown`, `onSvgMouseMove`, `onSvgMouseUp`, `onBackgroundClick`
+**Export:** `export default CustomFretboardEditor`
+**Purpose:** Interactive SVG fretboard for the Custom Fretboard page. Owns the full SVG structure with hit areas, drag+collision snapping, position markers, per-dot labels, selection ring, and drag preview. Fully controlled — all state lives in `CustomFretboard`.
+**Usage notes:**
+- Drag is mouse-only (desktop). Mobile: tap hit areas.
+- Hit areas: `role=button`, `tabIndex=0`, `aria-label` — keyboard + screen reader accessible
+- All dot fill/stroke values are inline SVG attributes — survive SVG export without CSS resolution
+- Position markers repeat every 12 frets via modulo
+- Dots are identified by UUID (`iCoords.id`), not array index
 
 ---
 
@@ -85,11 +99,12 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 
 | File | Route | Notes |
 |---|---|---|
-| `HomeContainer.tsx` | `/` (layout) | Wraps all routes — provides `Header`, `Footer`, `ControlsProvider` |
-| `Home.tsx` | `/home` | Landing page with feature cards |
-| `Scales.tsx` | `/scales` | Scale mode learning with fretboard |
-| `Intervals.tsx` | `/intervals` | Interval training with fretboard |
-| `Metronome.tsx` | `/metronome` | Metronome controls — renders `<Metronome />` component |
+| `src/components/Home/HomeContainer.tsx` | `/` (layout) | Wraps all routes — provides `Header`, `Footer`, `ControlsProvider` |
+| `src/components/Home/Home.tsx` | `/home` | Landing page with feature cards |
+| `src/components/Scales/Scales.tsx` | `/scales` | Scale mode learning with fretboard |
+| `src/components/Intervals/Intervals.tsx` | `/intervals` | Interval training with fretboard |
+| `src/components/Metronome/MetronomePage.tsx` | `/metronome` | Metronome controls — renders `<Metronome />` component |
+| `src/components/CustomFretboardEditor/CustomFretboard.tsx` | `/teaching-tools/fretboard` | Custom fretboard builder — per-dot color/label, collision drag, presets, undo/redo, SVG export |
 
 ---
 
@@ -124,6 +139,13 @@ Default `fretboardConfig`: `{ width: 700, height: 200, numFrets: 5, numStrings: 
 
 ## Hooks
 
+### `useCustomFretboardHistory`
+**File:** `src/hooks/useCustomFretboardHistory.ts`
+**Export:** named export
+**Purpose:** Past/present/future undo stack for `iHistorySnapshot { coords, fretboardConfig }`. Exposes `present`, `setHistory`, `undo`, `redo`, `canUndo`, `canRedo`. Config changes (`numFrets`, `numStrings`) are tracked alongside coord changes.
+
+---
+
 ### `useDebounce`
 **File:** `src/hooks/useDebounce.ts`
 **Purpose:** Generic debounce hook. Delays updating a value until after a specified wait period.
@@ -135,6 +157,13 @@ Default `fretboardConfig`: `{ width: 700, height: 200, numFrets: 5, numStrings: 
 ---
 
 ## Services
+
+### `customFretboardService`
+**File:** `src/services/customFretboardService.ts`
+**Export:** named — `getAll`, `getById`, `getByName`, `save`, `updateById`, `deleteById`
+**Purpose:** localStorage CRUD for `iCustomFretboardPreset[]`. Key: `basscore__custom_fretboard_presets`. Structured for DB migration.
+
+---
 
 ### `dictionaryService`
 **File:** `src/services/dictionaryService.ts`

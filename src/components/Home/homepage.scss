@@ -1,0 +1,240 @@
+// Rule: always use rem over px unless there is a clear advantage to using px
+// (e.g. 1px borders, scrollbar widths where pixel-precision matters)
+@use "sass:map";
+@use '../../styles/variables.scss' as *;
+
+.app-container {
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  .header-container {
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    padding: 2rem;
+
+    .hamburger-btn {
+      display: none;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-size: 1.5rem;
+      .p-button-icon {
+        color: white;
+      }
+      &:active,
+      &:focus,
+      &.p-focus {
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .menubar-container {
+      margin-top: 1rem;
+    }
+
+    @media (max-width: #{map.get($breakpoints, 'md')}) {
+      .hamburger-btn {
+        display: flex;
+      }
+
+      .menubar-container {
+        display: none;
+      }
+    }
+  }
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    .logo {
+      width: 31.25rem;
+
+      @media (max-width: #{map.get($breakpoints, 'sm')}) {
+        width: 23.90625rem;
+      }
+    }
+  }
+
+  .home-menu {
+    height: 6.25rem;
+    width: 100%;
+    .initials {
+      height: 3.125rem;
+      width: 3.125rem;
+    }
+  }
+
+  .p-menubar-start {
+    height: 3.125rem;
+  }
+
+  .nav-menu-container {
+    width: 15vw;
+    height: 100vw;
+  }
+
+  .main-section {
+    display: flex;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    padding: 0 3rem 0;
+
+    @media (max-width: #{map.get($breakpoints, 'md')}) {
+      padding: 0 1rem 0;
+    }
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: map.get($colors, "gray300");
+      border-radius: 0.5rem;
+    }
+  }
+}
+
+.p-menubar {
+  background: $overlay-1;
+  border: $overlay-1;
+  .p-menuitem {
+    :hover {
+      background-color: $overlay-hover;
+      border-radius: 0.25rem;
+    }
+    &.p-focus .p-menuitem-content {
+      background-color: $overlay-hover;
+    }
+  }
+}
+
+.nav-sidebar {
+  &.p-sidebar {
+    background: $overlay-1;
+  }
+
+  .p-sidebar-header {
+    background: $overlay-1;
+
+    .p-sidebar-close {
+      &:active,
+      &:focus,
+      &.p-focus {
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+
+  .nav-sidebar__img-container {
+    display: flex;
+    justify-content: center;
+
+    .nav-sidebar__img {
+      display: block;
+      width: 90%;
+      object-fit: contain;
+    }
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .nav-sidebar__item {
+    background: none;
+    border: none;
+    color: $primary-text;
+    font-size: 1.125rem;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    width: 100%;
+
+    &:hover {
+      background-color: $overlay-hover;
+    }
+  }
+}
+
+.home-container {
+  .offerings-cards {
+    display: flex;
+    gap: 2rem;
+    margin: 0 3rem 2rem 3rem;
+
+    .p-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .p-card-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        .p-card-content {
+          flex: 1;
+        }
+      }
+    }
+
+    .p-card-header {
+      display: flex;
+      justify-content: center;
+      img {
+        height: 12.5rem;
+        width: auto;
+        max-width: 100%;
+      }
+    }
+
+    .p-card-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: #{map.get($breakpoints, 'lg')}) {
+      flex-wrap: wrap;
+
+      .p-card {
+        flex: 0 0 calc(50% - 1rem);
+      }
+    }
+
+    @media (max-width: #{map.get($breakpoints, 'md')}) {
+      flex-direction: column;
+      align-items: center;
+      margin: 0 0 2rem 0;
+
+      .p-card {
+        flex: 0 0 auto;
+        width: 100%;
+      }
+    }
+  }
+
+  .hero {
+    margin-bottom: 2rem;
+  }
+
+  .hero-title {
+    margin-bottom: 0;
+  }
+
+  .hero-subtitle {
+    p {
+      margin: 0.5rem 0 0 0;
+    }
+  }
+}
