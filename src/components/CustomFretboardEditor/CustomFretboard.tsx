@@ -44,7 +44,7 @@ export const CustomFretboard = () => {
   const [dragState, setDragState] = useState<iDragState | null>(null);
   const [selectedDotId, setSelectedDotId] = useState<string | null>(null);
   const [applyToAll, setApplyToAll] = useState(false);
-  const [presets, setPresets] = useState<iCustomFretboardPreset[]>([]);
+  const [presets, setPresets] = useState<iCustomFretboardPreset[]>(() => customFretboardService.getAll());
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [lastLoadedPresetName, setLastLoadedPresetName] = useState<string | null>(null);
   const [savePresetDialog, setSavePresetDialog] = useState({ visible: false, name: '' });
@@ -55,18 +55,14 @@ export const CustomFretboard = () => {
 
   useEffect(() => {
     setFretboardConfig(historyConfig);
-  }, [historyConfig]);
-
-  useEffect(() => {
-    setPresets(customFretboardService.getAll());
-  }, []);
+  }, [historyConfig, setFretboardConfig]);
 
   const handleDeleteSelectedDot = useCallback(() => {
     if (!selectedDotId) return;
     const newCoords = coords.filter(d => d.id !== selectedDotId);
     setSelectedDotId(null);
     setHistory({ coords: newCoords, fretboardConfig: historyConfig });
-  }, [selectedDotId, coords, historyConfig]);
+  }, [selectedDotId, coords, historyConfig, setHistory]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

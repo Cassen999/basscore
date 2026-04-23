@@ -13,20 +13,17 @@ export const Metronome = (props: iMetronome) => {
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<number | null>(null);
-  let gainRef = useRef<GainNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
   const kickBufferRef = useRef<AudioBuffer | null>(null);
   const hiHatBufferRef = useRef<AudioBuffer | null>(null);
-  let gainNode: GainNode | null = null;
-  let ctx: AudioContext | null = null;
-
   // Keep dotCountRef in sync with derived dotCount
   useEffect(() => {
     dotCountRef.current = dotCount;
   }, [dotCount]);
 
   useEffect(() => {
-    ctx = new AudioContext();
-    gainNode = ctx.createGain()
+    const ctx = new AudioContext();
+    const gainNode = ctx.createGain();
 
     gainNode.gain.value = volume;
     gainNode.connect(ctx.destination);
@@ -84,6 +81,7 @@ export const Metronome = (props: iMetronome) => {
   // Reset beat position when subdivision or time signature changes so dots don't start mid-cycle
   useEffect(() => {
     beatCountRef.current = 0;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBeatCount(0);
   }, [subdivision, bpMeasure]);
 
@@ -101,8 +99,8 @@ export const Metronome = (props: iMetronome) => {
         }
 
         // Clear existing timer
-        if (timerRef.current ?? null) {
-          clearInterval(timerRef.current!!);
+        if (timerRef.current != null) {
+          clearInterval(timerRef.current);
         }
 
         // Fire immediately so the first pill and first sound are in sync,
@@ -117,6 +115,7 @@ export const Metronome = (props: iMetronome) => {
         timerRef.current = null;
       }
       beatCountRef.current = 0;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBeatCount(0);
     }
   }, [isPlaying, bpm, subdivision]);

@@ -74,7 +74,7 @@ export const Intervals = () => {
         colors: intervalRenderColors,
         unison: showUnison,
       }),
-    [interval, intervalRenderColors],
+    [interval, intervalRenderColors, showUnison],
   );
 
   const noteColorControls = (noteType: tNoteType): ReactNode => {
