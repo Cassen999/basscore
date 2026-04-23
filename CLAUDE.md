@@ -48,6 +48,9 @@ The full architecture and component registry live in `_dev/`. Read those files b
 ## SCSS / Styling
 
 - All SCSS files are imported centrally through `src/styles/index.scss`
+- Component SCSS files live in the component's folder (e.g. `src/components/Fretboard/fretboard.scss`)
+- Global/root styles live in `src/styles/` (`globalStyles.scss`, `root.scss`, `variables.scss`)
+- Reference `variables.scss` from a component SCSS file as `../../styles/variables.scss`
 - Use CSS custom properties (`var(--primary-color)`) — no hardcoded color values
 - BEM naming: `.block`, `.block__element`, `.block--modifier`
 - Max 2 levels of nesting — nest only when it adds clarity
@@ -60,7 +63,10 @@ The full architecture and component registry live in `_dev/`. Read those files b
 
 - Each component lives in its own folder under `src/components/` (e.g. `src/components/Fretboard/Fretboard.tsx`)
 - Its associated page lives in the same folder (e.g. `src/components/Metronome/MetronomePage.tsx` alongside `Metronome.tsx`)
-- If a page and a component share the same domain, they share a single SCSS file
+- Its SCSS file also lives in the same folder (e.g. `src/components/Fretboard/fretboard.scss`)
+- If a page and a component share the same domain, they share a single SCSS file in the same folder
+- `src/styles/` contains only global and root styles: `index.scss`, `globalStyles.scss`, `root.scss`, `variables.scss`
+- `src/styles/index.scss` imports all SCSS — reference component SCSS with path `../components/<Name>/<file>.scss`
 - Check `_dev/COMPONENTS.md` before creating a new component, hook, or service — it may already exist
 - Follow the "Adding New Files" checklist in `_dev/ARCHITECTURE.md` when adding pages or components
 
@@ -97,6 +103,20 @@ Do not silently comply with something that violates best practices.
 - Don't add comments unless the logic isn't self-evident
 - Don't add error handling for scenarios that can't happen
 - Keep responses short and direct
+
+## Testing
+
+The full testing strategy lives in `_dev/TESTING_STRATEGY.md`. Read it before writing or running tests.
+
+- Test files are colocated with the component: `<ComponentName>.test.tsx`
+- Tests use **Vitest** + **React Testing Library** + **userEvent**
+- Run `npm run test:run` before every commit — do not commit if tests fail
+- If tests fail, generate a report in `testing/TESTING_REPORTS.md` and a fix plan in `testing/FIX_PLANS.md` immediately
+- Only implement a fix plan when explicitly instructed
+
+When a new component, page, hook, or service is added, a corresponding test file must be created alongside it.
+
+---
 
 ## Edge Case Handling
 

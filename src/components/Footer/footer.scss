@@ -1,6 +1,6 @@
 // Rule: always use rem over px unless there is a clear advantage to using px
 @use 'sass:map';
-@use './variables.scss' as *;
+@use '../../styles/variables.scss' as *;
 
 .footer-container {
   display: flex;

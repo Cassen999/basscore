@@ -51,7 +51,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 ---
 
 ### `TimerControls`
-**File:** `src/components/TimerControls/TimerControls.tsx`
+**File:** `src/components/Timer/TimerControls.tsx`
 **Props:** none
 **Export:** `export const TimerControls`
 **Purpose:** Self-contained timer UI (time inputs, pill buttons, start/stop, reset, clear). Reads/writes shared timer state via `useTimer()`. Manages its own local reset-tracking state (`startDuration`, `pillTotal`). Used by `Timer` (dialog) and inline in the sidebar.
@@ -99,7 +99,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 
 | File | Route | Notes |
 |---|---|---|
-| `src/components/HomeContainer/HomeContainer.tsx` | `/` (layout) | Wraps all routes — provides `Header`, `Footer`, `ControlsProvider` |
+| `src/components/Home/HomeContainer.tsx` | `/` (layout) | Wraps all routes — provides `Header`, `Footer`, `ControlsProvider` |
 | `src/components/Home/Home.tsx` | `/home` | Landing page with feature cards |
 | `src/components/Scales/Scales.tsx` | `/scales` | Scale mode learning with fretboard |
 | `src/components/Intervals/Intervals.tsx` | `/intervals` | Interval training with fretboard |

@@ -1,14 +1,12 @@
 @use 'sass:map';
-@use './variables.scss' as *;
+@use '../../styles/variables.scss' as *;
 
-h1 {
-  margin-top: 0px;
-}
-
-.intervals-container {
+.scales-container {
   width: 100%;
-  .intervals-page-section {
+  gap: 2rem;
+  .scale-page-section {
     display: flex;
+    width: 100%;
     flex-direction: row-reverse;
     justify-content: space-between;
     padding-left: 2rem;
@@ -20,7 +18,7 @@ h1 {
       display: none;
     }
 
-    .intervals-page-section {
+    .scale-page-section {
       justify-content: center;
     }
   }

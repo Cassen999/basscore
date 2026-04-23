@@ -1,5 +1,5 @@
 @use 'sass:map';
-@use './variables.scss' as *;
+@use '../../styles/variables.scss' as *;
 
 .custom-fretboard-container {
   display: flex;

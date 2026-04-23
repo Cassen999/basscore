@@ -1,6 +1,6 @@
 // Rule: always use rem over px unless there is a clear advantage to using px
 @use 'sass:map';
-@use './variables.scss' as *;
+@use '../../styles/variables.scss' as *;
 
 // Timer menu button — reset browser <button> defaults and suppress PrimeReact
 // hover/focus backgrounds so only the cursor and text styling remain.
