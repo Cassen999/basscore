@@ -110,7 +110,7 @@ The full testing strategy lives in `_dev/TESTING_STRATEGY.md`. Read it before wr
 
 - Test files are colocated with the component: `<ComponentName>.test.tsx`
 - Tests use **Vitest** + **React Testing Library** + **userEvent**
-- Run `npm run test:run` before every commit — do not commit if tests fail
+- Run `npm run test:run`, `npm run lint`, and `npm run build` before every commit — do not commit if any of them fail
 - If tests fail, generate a report in `testing/TESTING_REPORTS.md` and a fix plan in `testing/FIX_PLANS.md` immediately
 - Only implement a fix plan when explicitly instructed
 
