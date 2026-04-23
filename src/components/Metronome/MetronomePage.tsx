@@ -1,12 +1,12 @@
 import { InputNumber } from "primereact/inputnumber";
-import { Metronome } from "../components/Metronome";
+import { Metronome } from "./Metronome";
 import { useState, useEffect } from "react";
-import type { tSubdivision } from "../types/types";
+import type { tSubdivision } from "../../types/types";
 import { Dropdown, type DropdownChangeEvent } from "primereact/dropdown";
 import { Button } from "primereact/button";
-import BCTooltip from "../components/BCTooltip";
+import BCTooltip from "../BCTooltip/BCTooltip";
 import { Slider } from "primereact/slider";
-import { subdivisions, timeSignatures } from "../helpers/dataSets";
+import { subdivisions, timeSignatures } from "../../helpers/dataSets";
 
 export const MetronomePage = () => {
   const [bpm, setBpm] = useState<number>(120);

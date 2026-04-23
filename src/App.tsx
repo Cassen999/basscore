@@ -1,11 +1,11 @@
-import { Home } from "./pages/Home";
-import { Intervals } from "./pages/Intervals";
-import { Scales } from "./pages/Scales";
+import { Home } from "./components/Home/Home";
+import { Intervals } from "./components/Intervals/Intervals";
+import { Scales } from "./components/Scales/Scales";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import "./styles/index.scss";
-import { HomeContainer } from "./pages/HomeContainer";
-import { MetronomePage } from "./pages/Metronome";
-import { CustomFretboard } from "./pages/CustomFretboard";
+import { HomeContainer } from "./components/HomeContainer/HomeContainer";
+import { MetronomePage } from "./components/Metronome/MetronomePage";
+import { CustomFretboard } from "./components/CustomFretboardEditor/CustomFretboard";
 
 function App() {
   return (

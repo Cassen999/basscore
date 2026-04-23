@@ -7,13 +7,13 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { SelectButton } from 'primereact/selectbutton';
-import { useControls } from '../contexts/ControlsContext';
-import { useCustomFretboardHistory } from '../hooks/useCustomFretboardHistory';
-import * as customFretboardService from '../services/customFretboardService';
-import type { iCoords, iControlElementGroups, iCustomFretboardPreset, iDragState, iFretboardConfig } from '../types/types';
-import { findAvailableFret, snapToCell } from '../helpers/fretboardHelpers';
-import ControlPanel from '../components/ControlPanel';
-import CustomFretboardEditor from '../components/CustomFretboardEditor';
+import { useControls } from '../../contexts/ControlsContext';
+import { useCustomFretboardHistory } from '../../hooks/useCustomFretboardHistory';
+import * as customFretboardService from '../../services/customFretboardService';
+import type { iCoords, iControlElementGroups, iCustomFretboardPreset, iDragState, iFretboardConfig } from '../../types/types';
+import { findAvailableFret, snapToCell } from '../../helpers/fretboardHelpers';
+import ControlPanel from '../ControlPanel/ControlPanel';
+import CustomFretboardEditor from './CustomFretboardEditor';
 
 const INITIAL_CONFIG: iFretboardConfig = {
   width: 700,

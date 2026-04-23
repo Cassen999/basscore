@@ -58,7 +58,9 @@ The full architecture and component registry live in `_dev/`. Read those files b
 
 ## File Structure
 
-- If a page and a component share the same domain (e.g. `Metronome.tsx` in both pages and components), they share a single SCSS file
+- Each component lives in its own folder under `src/components/` (e.g. `src/components/Fretboard/Fretboard.tsx`)
+- Its associated page lives in the same folder (e.g. `src/components/Metronome/MetronomePage.tsx` alongside `Metronome.tsx`)
+- If a page and a component share the same domain, they share a single SCSS file
 - Check `_dev/COMPONENTS.md` before creating a new component, hook, or service — it may already exist
 - Follow the "Adding New Files" checklist in `_dev/ARCHITECTURE.md` when adding pages or components
 

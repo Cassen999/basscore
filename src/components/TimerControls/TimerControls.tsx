@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from 'primereact/button';
-import { useTimer } from '../contexts/TimerContext';
+import { useTimer } from '../../contexts/TimerContext';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 

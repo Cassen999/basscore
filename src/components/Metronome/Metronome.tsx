@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { iMetronome } from "../types/types";
+import type { iMetronome } from "../../types/types";
 
 export const Metronome = (props: iMetronome) => {
   const { bpm, subdivision, isPlaying, volume, bpMeasure } = props;

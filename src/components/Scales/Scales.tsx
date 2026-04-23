@@ -1,12 +1,12 @@
 import { SelectButton } from "primereact/selectbutton";
-import ControlPanel from "../components/ControlPanel";
-import Fretboard from "../components/Fretboard";
-import { useControls } from "../contexts/ControlsContext";
-import { createScale } from "../helpers/fretpoints";
+import ControlPanel from "../ControlPanel/ControlPanel";
+import Fretboard from "../Fretboard/Fretboard";
+import { useControls } from "../../contexts/ControlsContext";
+import { createScale } from "../../helpers/fretpoints";
 import type {
   iControlElementGroups,
   iScaleSelectItems,
-} from "../types/types";
+} from "../../types/types";
 import { ColorPicker } from "primereact/colorpicker";
 import { useEffect, type ReactNode } from "react";
 

@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import BCTooltip from "../components/BCTooltip";
+import BCTooltip from "../BCTooltip/BCTooltip";
 import type { JSX } from "react";
 import { useNavigate } from "react-router-dom";
 

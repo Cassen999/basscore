@@ -1,11 +1,11 @@
-import type { iFretboardProps } from "../types/types";
+import type { iFretboardProps } from "../../types/types";
 import {
   getX,
   getY,
   mapFretPoints,
-} from "../helpers/fretboardHelpers";
+} from "../../helpers/fretboardHelpers";
 import { useMemo } from "react";
-import { useControls } from "../contexts/ControlsContext";
+import { useControls } from "../../contexts/ControlsContext";
 
 const Fretboard = (props?: iFretboardProps) => {
   const { fretboardConfig } = useControls();

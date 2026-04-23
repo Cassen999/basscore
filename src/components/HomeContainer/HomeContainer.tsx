@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import { Header } from "../components/Header";
-import { ControlsProvider } from "../contexts/ControlsContext";
-import { TimerProvider } from "../contexts/TimerContext";
-import Footer from "../components/Footer";
+import { Header } from "../Header/Header";
+import { ControlsProvider } from "../../contexts/ControlsContext";
+import { TimerProvider } from "../../contexts/TimerContext";
+import Footer from "../Footer/Footer";
 
 export const HomeContainer = () => {
   return (

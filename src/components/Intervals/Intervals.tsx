@@ -1,14 +1,14 @@
-import Fretboard from "../components/Fretboard";
-import { createInterval } from "../helpers/fretpoints";
-import { useControls } from "../contexts/ControlsContext";
+import Fretboard from "../Fretboard/Fretboard";
+import { createInterval } from "../../helpers/fretpoints";
+import { useControls } from "../../contexts/ControlsContext";
 import { useEffect, useMemo, type ReactNode } from "react";
-import ControlPanel from "../components/ControlPanel";
+import ControlPanel from "../ControlPanel/ControlPanel";
 import { ColorPicker } from "primereact/colorpicker";
 import type {
   iControlElementGroups,
   iIntervalSelectItems,
   tNoteType,
-} from "../types/types";
+} from "../../types/types";
 import { InputSwitch } from "primereact/inputswitch";
 import { SelectButton } from "primereact/selectbutton";
 
