@@ -9,7 +9,7 @@ interface iCustomFretboardEditorProps {
   dragState: iDragState | null;
   selectedDotId: string | null;
   resolvedPrimaryColor: string;
-  svgRef: RefObject<SVGSVGElement>;
+  svgRef: RefObject<SVGSVGElement | null>;
   onCellClick: (string: number, fret: number) => void;
   onDotMouseDown: (id: string) => void;
   onSvgMouseMove: (e: React.MouseEvent<SVGSVGElement>) => void;
