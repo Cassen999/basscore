@@ -27,6 +27,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (status !== 'running') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayMs(duration !== null ? Math.max(0, duration * 1000 - accumulated) : 0);
       return;
     }
@@ -85,6 +86,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
   return <TimerContext.Provider value={value}>{children}</TimerContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTimer = () => {
   const context = useContext(TimerContext);
   if (!context) throw new Error('useTimer must be used within a TimerProvider');

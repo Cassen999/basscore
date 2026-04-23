@@ -47,6 +47,7 @@ const CustomFretboardEditor = ({
   const hitHeight = fretpointRadius * 3;
 
   const positionMarkers = useMemo(() => {
+    const { numFrets, numStrings, fretpointRadius } = fretboardConfig;
     const markers: React.ReactElement[] = [];
     const cyCenter = (getY(numStrings, fretboardConfig) + getY(1, fretboardConfig)) / 2;
     const r = fretpointRadius * 0.6;

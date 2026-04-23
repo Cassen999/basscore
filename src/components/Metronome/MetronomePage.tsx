@@ -36,7 +36,7 @@ export const MetronomePage = () => {
               min={40}
               max={240}
               value={bpm}
-              onValueChange={(e) => setBpm(e.value!!)}
+              onValueChange={(e) => setBpm(e.value!)}
               inputMode="numeric"
             />
           </label>
