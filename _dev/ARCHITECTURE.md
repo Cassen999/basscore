@@ -40,6 +40,16 @@ Defined in `App.tsx`. All routes are children of the `HomeContainer` outlet, whi
 
 To add a new route: create a page in `src/pages/`, add a `<Route>` in `App.tsx`, and add a nav item in `Header.tsx`.
 
+### GitHub Pages deep-link fix
+
+GitHub Pages is a static file server — it returns 404 for any path it can't resolve to a real file. Because this app uses `BrowserRouter`, direct navigation to a route (e.g. `/basscore/home`) would 404 before React ever loads.
+
+**How it works:**
+- `public/404.html` — GitHub Pages serves this on any 404. A script encodes the requested path into a redirect to `index.html` (e.g. `/basscore/home` → `/basscore/?/home`).
+- `index.html` (head script) — Detects the encoded query string, uses `history.replaceState` to restore the real path, then React mounts with the correct route.
+
+If the base path in `vite.config.ts` ever changes from `/basscore/`, update `pathSegmentsToKeep` in `public/404.html` to match the new depth (1 segment = 1).
+
 ---
 
 ## File Naming
