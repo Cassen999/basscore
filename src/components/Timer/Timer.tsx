@@ -1,6 +1,6 @@
 import { Dialog } from 'primereact/dialog';
 import type { iTimerDialogProps } from '../../types/types';
-import { TimerControls } from '../TimerControls/TimerControls';
+import { TimerControls } from './TimerControls';
 
 export const Timer = ({ visible, onHide, anchorRect }: iTimerDialogProps) => {
   const dialogStyle = anchorRect

@@ -10,7 +10,7 @@ import { Panel } from 'primereact/panel';
 import { useNavigate } from 'react-router-dom';
 import SidebarControls from '../SidebarControls/SidebarControls';
 import { Timer } from '../Timer/Timer';
-import { TimerControls } from '../TimerControls/TimerControls';
+import { TimerControls } from '../Timer/TimerControls';
 import { useTimer } from '../../contexts/TimerContext';
 
 export const Header = () => {

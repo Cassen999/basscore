@@ -3,16 +3,16 @@
 @use "primeicons/primeicons.css";
 @use './root.scss';
 @use './globalStyles.scss';
-@use './homepage.scss';
-@use './fretboard.scss';
-@use './intervals.scss';
-@use './controlPanel.scss';
-@use './scales.scss';
-@use './metronome.scss';
-@use './timer.scss';
-@use './footer.scss';
-@use './sidebarControls.scss';
-@use './customFretboard.scss';
+@use '../components/Home/homepage.scss';
+@use '../components/Fretboard/fretboard.scss';
+@use '../components/Intervals/intervals.scss';
+@use '../components/ControlPanel/controlPanel.scss';
+@use '../components/Scales/scales.scss';
+@use '../components/Metronome/metronome.scss';
+@use '../components/Timer/timer.scss';
+@use '../components/Footer/footer.scss';
+@use '../components/SidebarControls/sidebarControls.scss';
+@use '../components/CustomFretboardEditor/customFretboard.scss';
 
 @font-face {
   font-family: 'SpaceGrotesk';

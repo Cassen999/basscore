@@ -11,25 +11,38 @@ BASSCORE is a React + TypeScript SPA built with Vite. It is deployed to GitHub P
 src/
 ├── main.tsx               # Entry point — mounts App with StrictMode
 ├── App.tsx                # Route definitions (export default)
-├── index.scss             # Aggregates all SCSS imports
 │
-├── components/            # One folder per component; page colocates inside if it shares the domain
+├── components/            # One folder per component; page and SCSS colocate inside
 │   ├── Fretboard/
-│   │   └── Fretboard.tsx
+│   │   ├── Fretboard.tsx
+│   │   └── fretboard.scss
 │   ├── Metronome/
 │   │   ├── Metronome.tsx        # component
-│   │   └── MetronomePage.tsx    # page (same domain)
+│   │   ├── MetronomePage.tsx    # page (same domain)
+│   │   └── metronome.scss       # shared by both (same domain)
 │   ├── CustomFretboardEditor/
 │   │   ├── CustomFretboardEditor.tsx
-│   │   └── CustomFretboard.tsx  # page
-│   ├── HomeContainer/
-│   │   └── HomeContainer.tsx    # layout shell / page
+│   │   ├── CustomFretboard.tsx  # page
+│   │   └── customFretboard.scss
+│   ├── Home/
+│   │   ├── Home.tsx
+│   │   ├── HomeContainer.tsx    # layout shell
+│   │   └── homepage.scss
+│   ├── Timer/
+│   │   ├── Timer.tsx
+│   │   ├── TimerControls.tsx
+│   │   └── timer.scss
 │   └── ...                      # one folder per component or standalone page
 ├── contexts/              # React contexts — do not add without permission
 ├── hooks/                 # Custom hooks — must use 'use' prefix
 ├── services/              # External API calls
 ├── helpers/               # Pure utility/math functions (no side effects)
-├── styles/                # All SCSS files
+├── styles/                # Global and root styles only
+│   ├── index.scss         # Aggregates all SCSS imports
+│   ├── globalStyles.scss
+│   ├── root.scss
+│   └── variables.scss
+├── test/                  # Vitest setup file
 ├── types/                 # types.ts — all shared TypeScript types
 └── assets/                # Static files (images, fonts)
 ```
@@ -75,7 +88,7 @@ If the base path in `vite.config.ts` ever changes from `/basscore/`, update `pat
 | SCSS | `camelCase.scss` | `metronome.scss` |
 | Context | `PascalCase.tsx` with `Context` suffix | `ControlsContext.tsx` |
 
-If a page and a component share the same domain (e.g. `Metronome/Metronome.tsx` + `Metronome/MetronomePage.tsx`), they share a single SCSS file (`styles/metronome.scss`). Otherwise every file gets its own SCSS file.
+If a page and a component share the same domain (e.g. `Metronome/Metronome.tsx` + `Metronome/MetronomePage.tsx`), they share a single SCSS file colocated in the same folder (e.g. `Metronome/metronome.scss`). Otherwise every component gets its own SCSS file in its folder.
 
 When a page and a component share a name, the page file is suffixed with `Page` (e.g. `MetronomePage.tsx`) to avoid a filename collision inside the shared folder.
 
@@ -89,13 +102,13 @@ When a page and a component share a name, the page file is suffixed with `Page` 
    - If no: create `src/components/Foo/Foo.tsx` in a new folder named after the page
 2. Add a `<Route>` in `App.tsx`
 3. Add a nav link in `src/components/Header/Header.tsx`
-4. Create `src/styles/myPage.scss` (or share with a same-name component)
-5. Import the SCSS in `src/styles/index.scss`
+4. Create `src/components/Foo/myPage.scss` (or share with a same-name component in the same folder)
+5. Import the SCSS in `src/styles/index.scss` using the path `../components/Foo/myPage.scss`
 
 **New component:**
 1. Create `src/components/MyComponent/MyComponent.tsx`
-2. Create `src/styles/myComponent.scss` (or share with a same-name page)
-3. Import the SCSS in `src/styles/index.scss`
+2. Create `src/components/MyComponent/myComponent.scss` (or share with a same-name page)
+3. Import the SCSS in `src/styles/index.scss` using the path `../components/MyComponent/myComponent.scss`
 
 **New hook:**
 1. Create `src/hooks/useMyHook.ts`
@@ -108,6 +121,29 @@ When a page and a component share a name, the page file is suffixed with `Page` 
 **New types:**
 - Shared types → `src/types/types.ts`
 - Local types → top of the file that uses them
+
+---
+
+## Testing
+
+Full strategy: `_dev/TESTING_STRATEGY.md`
+
+| Item | Location |
+|---|---|
+| Test runner | Vitest (configured in `vite.config.ts`) |
+| Setup file | `src/test/setup.ts` |
+| Test files | Colocated with component — `<ComponentName>.test.tsx` |
+| Failure reports | `testing/TESTING_REPORTS.md` |
+| Fix plans | `testing/FIX_PLANS.md` |
+
+**Scripts:**
+```bash
+npm test              # Watch mode
+npm run test:run      # Single run (run before every commit)
+npm run test:coverage # Run with coverage report
+```
+
+Coverage thresholds (enforced globally): lines ≥ 90%, branches ≥ 85%, functions ≥ 90%, statements ≥ 90%.
 
 ---
 

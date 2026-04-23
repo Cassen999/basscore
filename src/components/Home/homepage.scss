@@ -1,7 +1,7 @@
 // Rule: always use rem over px unless there is a clear advantage to using px
 // (e.g. 1px borders, scrollbar widths where pixel-precision matters)
 @use "sass:map";
-@use "./variables.scss" as *;
+@use '../../styles/variables.scss' as *;
 
 .app-container {
   overflow: hidden;
