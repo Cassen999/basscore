@@ -1,0 +1,14 @@
+# New File Tree Strategy
+
+## Component file structure
+1. under components, there must be a folder for each component
+	- folder must be named after component
+	- Example: 
+		footer, header, etc.
+2. Contents of the component folder should be:
+	- Its associated component
+	- Its associate page (if applicable)
+3. Only create the new folders that will live under the components folder and the testing files. All component and page files must be moved from their current location to the new location I have described
+
+Document this strategy in the dev documentation
+
