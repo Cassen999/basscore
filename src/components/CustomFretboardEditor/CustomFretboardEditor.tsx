@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { RefObject } from 'react';
-import type { iCoords, iDragState, iFretboardConfig } from '../types/types';
-import { getX, getY } from '../helpers/fretboardHelpers';
+import type { iCoords, iDragState, iFretboardConfig } from '../../types/types';
+import { getX, getY } from '../../helpers/fretboardHelpers';
 
 interface iCustomFretboardEditorProps {
   coords: iCoords[];

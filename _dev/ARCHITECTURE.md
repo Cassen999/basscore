@@ -13,8 +13,18 @@ src/
 ├── App.tsx                # Route definitions (export default)
 ├── index.scss             # Aggregates all SCSS imports
 │
-├── pages/                 # One file per route
-├── components/            # Reusable UI components
+├── components/            # One folder per component; page colocates inside if it shares the domain
+│   ├── Fretboard/
+│   │   └── Fretboard.tsx
+│   ├── Metronome/
+│   │   ├── Metronome.tsx        # component
+│   │   └── MetronomePage.tsx    # page (same domain)
+│   ├── CustomFretboardEditor/
+│   │   ├── CustomFretboardEditor.tsx
+│   │   └── CustomFretboard.tsx  # page
+│   ├── HomeContainer/
+│   │   └── HomeContainer.tsx    # layout shell / page
+│   └── ...                      # one folder per component or standalone page
 ├── contexts/              # React contexts — do not add without permission
 ├── hooks/                 # Custom hooks — must use 'use' prefix
 ├── services/              # External API calls
@@ -30,15 +40,16 @@ src/
 
 Defined in `App.tsx`. All routes are children of the `HomeContainer` outlet, which provides the `Header`, `Footer`, and `ControlsProvider` context wrapper.
 
-| Path | Component |
-|---|---|
-| `/` | Redirects to `/home` |
-| `/home` | `Home` |
-| `/scales` | `Scales` |
-| `/intervals` | `Intervals` |
-| `/metronome` | `MetronomePage` |
+| Path | Component | File |
+|---|---|---|
+| `/` | Redirects to `/home` | — |
+| `/home` | `Home` | `src/components/Home/Home.tsx` |
+| `/scales` | `Scales` | `src/components/Scales/Scales.tsx` |
+| `/intervals` | `Intervals` | `src/components/Intervals/Intervals.tsx` |
+| `/metronome` | `MetronomePage` | `src/components/Metronome/MetronomePage.tsx` |
+| `/teaching-tools/fretboard` | `CustomFretboard` | `src/components/CustomFretboardEditor/CustomFretboard.tsx` |
 
-To add a new route: create a page in `src/pages/`, add a `<Route>` in `App.tsx`, and add a nav item in `Header.tsx`.
+To add a new route: create a page file inside the appropriate `src/components/<Name>/` folder, add a `<Route>` in `App.tsx`, and add a nav item in `src/components/Header/Header.tsx`.
 
 ### GitHub Pages deep-link fix
 
@@ -56,7 +67,7 @@ If the base path in `vite.config.ts` ever changes from `/basscore/`, update `pat
 
 | Type | Convention | Example |
 |---|---|---|
-| Page component | `PascalCase.tsx` | `Metronome.tsx` |
+| Page component | `PascalCase.tsx` | `MetronomePage.tsx` |
 | UI component | `PascalCase.tsx` | `Fretboard.tsx` |
 | Custom hook | `camelCase.ts(x)` with `use` prefix | `useDebounce.ts` |
 | Service | `camelCase.ts` | `dictionaryService.ts` |
@@ -64,21 +75,25 @@ If the base path in `vite.config.ts` ever changes from `/basscore/`, update `pat
 | SCSS | `camelCase.scss` | `metronome.scss` |
 | Context | `PascalCase.tsx` with `Context` suffix | `ControlsContext.tsx` |
 
-If a page and a component share the same domain (e.g. `pages/Metronome.tsx` + `components/Metronome.tsx`), they share a single SCSS file (`styles/metronome.scss`). Otherwise every file gets its own SCSS file.
+If a page and a component share the same domain (e.g. `Metronome/Metronome.tsx` + `Metronome/MetronomePage.tsx`), they share a single SCSS file (`styles/metronome.scss`). Otherwise every file gets its own SCSS file.
+
+When a page and a component share a name, the page file is suffixed with `Page` (e.g. `MetronomePage.tsx`) to avoid a filename collision inside the shared folder.
 
 ---
 
 ## Adding New Files
 
 **New page:**
-1. Create `src/pages/MyPage.tsx`
+1. Determine if it shares a domain with an existing component (e.g. a new `FooPage` that renders `Foo`)
+   - If yes: create `src/components/Foo/FooPage.tsx` alongside the component
+   - If no: create `src/components/Foo/Foo.tsx` in a new folder named after the page
 2. Add a `<Route>` in `App.tsx`
-3. Add a nav link in `src/components/Header.tsx`
+3. Add a nav link in `src/components/Header/Header.tsx`
 4. Create `src/styles/myPage.scss` (or share with a same-name component)
 5. Import the SCSS in `src/styles/index.scss`
 
 **New component:**
-1. Create `src/components/MyComponent.tsx`
+1. Create `src/components/MyComponent/MyComponent.tsx`
 2. Create `src/styles/myComponent.scss` (or share with a same-name page)
 3. Import the SCSS in `src/styles/index.scss`
 

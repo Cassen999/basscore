@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import type { iControlElementGroups, iControlProps } from "../types/types";
+import type { iControlElementGroups, iControlProps } from "../../types/types";
 import type { ReactNode } from "react";
 
 const ControlPanel = (props: iControlProps) => {

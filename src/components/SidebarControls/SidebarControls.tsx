@@ -1,9 +1,9 @@
 import { useLocation } from 'react-router-dom';
-import { useControls } from '../contexts/ControlsContext';
+import { useControls } from '../../contexts/ControlsContext';
 import { Dropdown } from 'primereact/dropdown';
 import { ColorPicker } from 'primereact/colorpicker';
 import { InputSwitch } from 'primereact/inputswitch';
-import type { iScaleSelectItems, iIntervalSelectItems } from '../types/types';
+import type { iScaleSelectItems, iIntervalSelectItems } from '../../types/types';
 
 const scaleOptions: iScaleSelectItems[] = [
   { name: 'Major', value: 'major' },

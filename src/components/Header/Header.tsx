@@ -2,16 +2,16 @@
 import { useRef, useState } from 'react';
 import type { MenuItem } from 'primereact/menuitem';
 import type { MenuItemOptions } from 'primereact/menuitem';
-import Logo from '../assets/logo.png';
+import Logo from '../../assets/logo.png';
 import { Menubar } from 'primereact/menubar';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { useNavigate } from 'react-router-dom';
-import SidebarControls from './SidebarControls';
-import { Timer } from './Timer';
-import { TimerControls } from './TimerControls';
-import { useTimer } from '../contexts/TimerContext';
+import SidebarControls from '../SidebarControls/SidebarControls';
+import { Timer } from '../Timer/Timer';
+import { TimerControls } from '../TimerControls/TimerControls';
+import { useTimer } from '../../contexts/TimerContext';
 
 export const Header = () => {
   const nav = useNavigate();
