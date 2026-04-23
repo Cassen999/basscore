@@ -176,14 +176,15 @@ flowchart TD
     E --> T{Target}
 
     T -->|"Click empty hit area\n(no dot selected)"| ADD["Create new dot with UUID\nnewDot.id → selectedDotId"]
-    T -->|"Click empty hit area\n(dot is selected)"| MOVE["Move selected dot to (string, fret)\nupdate string + fret · push to history\nselectedDotId unchanged\n— primary move mechanic on mobile"]
+    T -->|"Click empty hit area\n(dot is selected)"| DESEL3["selectedDotId = null\n(no move, no create)"]
     T -->|"Click occupied hit area\n(different dot)"| SEL["selectedDotId = that dot's id"]
     T -->|"Click occupied hit area\n(already selected)"| DESEL["selectedDotId = null"]
     T -->|"MouseDown on dot hit area"| DRAGSEL["selectedDotId = id + begin drag"]
     T -->|"Click background rect"| DESEL2["selectedDotId = null"]
     T -->|"Color picker interaction"| NOOP["No change to selection"]
-    T -->|"Delete or Backspace key\n(selectedDotId != null)"| DEL["Remove selected dot\npush to history\nselectedDotId = null"]
-    T -->|"Delete or Backspace key\n(selectedDotId == null)"| NOOP2["No-op"]
+    T -->|"Delete key\n(selectedDotId != null)"| DEL["Remove selected dot\npush to history\nselectedDotId = null"]
+    T -->|"Delete key\n(selectedDotId == null)"| NOOP2["No-op"]
+    T -->|"Click outside SVG\n(not in controls or overlay)"| DESEL4["selectedDotId = null\n(global mousedown handler)"]
 ```
 
 ---
@@ -196,11 +197,11 @@ flowchart TD
     A --> B{Action type}
 
     B -->|"Click empty hit area\n(no dot selected)"| ADD["Create dot { id: UUID, str, fret, color }\nselectedDotId = new id · push to history"]
-    B -->|"Click empty hit area\n(dot selected)"| MOVE["Move selected dot to (str, fret)\nupdate string + fret · push to history\nselectedDotId unchanged"]
+    B -->|"Click empty hit area\n(dot selected)"| DESEL_EMPTY["selectedDotId = null\n(no move, no create)"]
     B -->|Click unselected dot| SEL["selectedDotId = dot.id"]
     B -->|Click selected dot| DESEL["selectedDotId = null"]
     B -->|Click background| DESEL2["selectedDotId = null"]
-    B -->|Delete/Backspace (dot selected)| DEL["Remove dot · selectedDotId = null · push to history"]
+    B -->|"Delete key or Delete button\n(dot selected)"| DEL["Remove dot · selectedDotId = null · push to history"]
     B -->|Change color picker| CC["handleColorChange() — see Color Picker Behavior"]
     B -->|Toggle Apply to All| ATA["applyToAll = !applyToAll"]
     B -->|"Type in Label InputText\n(dot selected)"| LBL["handleDotLabelChange(selectedDotId, value)\ntrim to 2 chars · empty = undefined\npush to history"]
@@ -394,7 +395,7 @@ Markers repeat every 12 frets. Only rendered when `fret ≤ numFrets`.
 ```
 markerPosition(fret) = fret % 12 === 0 ? 12 : fret % 12
 
-Single dot:  markerPosition in { 5, 7, 9 }
+Single dot:  markerPosition in { 3, 5, 7, 9 }
 Double dot:  markerPosition === 12
 
 Examples for a 24-fret neck:
@@ -550,7 +551,7 @@ flowchart LR
     M -->|"No touch handlers"| ND["Drag disabled"]
     M -->|"Tap empty cell (no dot selected)"| P2["Place new dot"]
     M -->|"Tap occupied cell"| SEL2["Select / deselect dot"]
-    M -->|"Tap empty cell (dot selected)"| MV["Move selected dot to tapped position\n(tap-select → tap-destination)"]
+    M -->|"Tap empty cell (dot selected)"| MV["selectedDotId = null\n(deselect — no move)"]
     M -->|"CSS rotate 90°"| ROT["SVG rotated\nfret 1 = topmost"]
 ```
 

@@ -74,6 +74,20 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 
 ---
 
+### `CustomFretboardEditor`
+**File:** `src/components/CustomFretboardEditor.tsx`
+**Props:** `iCustomFretboardEditorProps` (local) — `coords`, `fretboardConfig`, `dragState`, `selectedDotId`, `svgRef`, `onCellClick`, `onDotMouseDown`, `onSvgMouseMove`, `onSvgMouseUp`, `onBackgroundClick`
+**Export:** `export default CustomFretboardEditor`
+**Purpose:** Interactive SVG fretboard for the Custom Fretboard page. Owns the full SVG structure with hit areas, drag+collision snapping, position markers, per-dot labels, selection ring, and drag preview. Fully controlled — all state lives in `CustomFretboard`.
+**Usage notes:**
+- Drag is mouse-only (desktop). Mobile: tap hit areas.
+- Hit areas: `role=button`, `tabIndex=0`, `aria-label` — keyboard + screen reader accessible
+- All dot fill/stroke values are inline SVG attributes — survive SVG export without CSS resolution
+- Position markers repeat every 12 frets via modulo
+- Dots are identified by UUID (`iCoords.id`), not array index
+
+---
+
 ### `DictionaryPanel` ⚠️ In Progress
 **File:** `src/components/DictionaryPanel.tsx`
 **Purpose:** Intended to display music terminology definitions fetched from `dictionaryapi.dev`.
@@ -90,6 +104,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 | `Scales.tsx` | `/scales` | Scale mode learning with fretboard |
 | `Intervals.tsx` | `/intervals` | Interval training with fretboard |
 | `Metronome.tsx` | `/metronome` | Metronome controls — renders `<Metronome />` component |
+| `CustomFretboard.tsx` | `/teaching-tools/fretboard` | Custom fretboard builder — per-dot color/label, collision drag, presets, undo/redo, SVG export |
 
 ---
 
@@ -124,6 +139,13 @@ Default `fretboardConfig`: `{ width: 700, height: 200, numFrets: 5, numStrings: 
 
 ## Hooks
 
+### `useCustomFretboardHistory`
+**File:** `src/hooks/useCustomFretboardHistory.ts`
+**Export:** named export
+**Purpose:** Past/present/future undo stack for `iHistorySnapshot { coords, fretboardConfig }`. Exposes `present`, `setHistory`, `undo`, `redo`, `canUndo`, `canRedo`. Config changes (`numFrets`, `numStrings`) are tracked alongside coord changes.
+
+---
+
 ### `useDebounce`
 **File:** `src/hooks/useDebounce.ts`
 **Purpose:** Generic debounce hook. Delays updating a value until after a specified wait period.
@@ -135,6 +157,13 @@ Default `fretboardConfig`: `{ width: 700, height: 200, numFrets: 5, numStrings: 
 ---
 
 ## Services
+
+### `customFretboardService`
+**File:** `src/services/customFretboardService.ts`
+**Export:** named — `getAll`, `getById`, `getByName`, `save`, `updateById`, `deleteById`
+**Purpose:** localStorage CRUD for `iCustomFretboardPreset[]`. Key: `basscore__custom_fretboard_presets`. Structured for DB migration.
+
+---
 
 ### `dictionaryService`
 **File:** `src/services/dictionaryService.ts`

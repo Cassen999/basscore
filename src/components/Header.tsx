@@ -28,6 +28,12 @@ export const Header = () => {
     { label: 'Scales', command: () => nav('/scales') },
     { label: 'Intervals', command: () => nav('/intervals') },
     {
+      label: 'Teaching Tools',
+      items: [
+        { label: 'Fretboard', command: () => nav('/teaching-tools/fretboard') },
+      ],
+    },
+    {
       label: 'Timer',
       template: (_item: MenuItem, options: MenuItemOptions) => (
         <button
@@ -51,6 +57,7 @@ export const Header = () => {
     { label: 'Metronome', url: '/metronome' },
     { label: 'Scales', url: '/scales' },
     { label: 'Intervals', url: '/intervals' },
+    { label: 'Fretboard', url: '/teaching-tools/fretboard' },
   ];
 
   return (

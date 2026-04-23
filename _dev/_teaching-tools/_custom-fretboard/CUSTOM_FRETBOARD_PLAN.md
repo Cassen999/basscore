@@ -10,7 +10,7 @@ See [`CUSTOM_FRETBOARD_DIAGRAM.md`](./CUSTOM_FRETBOARD_DIAGRAM.md) for geometry,
 
 Custom Fretboard lets users build a custom bass fretboard layout: configure fret and string count (tracked in undo history), click to place or remove colored dot markers with optional 2-character text labels, drag dots to new positions (desktop) with collision-aware snapping, assign individual colors per dot with an "Apply to all" option, save named presets to localStorage (structured for future DB migration), undo/redo any change including config changes, and export the result as a standalone vector SVG via a filename prompt dialog.
 
-Position markers (frets 5, 7, 9, 12) render as static decorations centered between the strings, matching the grid line color. Markers repeat every 12 frets using modulo. All frets are equal in width.
+Position markers (frets 3, 5, 7, 9, 12) render as static decorations centered between the strings, matching the grid line color. Markers repeat every 12 frets using modulo. All frets are equal in width.
 
 ---
 
@@ -22,16 +22,21 @@ Position markers (frets 5, 7, 9, 12) render as static decorations centered betwe
 | Dot identity | Each dot has a UUID (`id`) — handlers use `id`, not array index |
 | Per-dot color UX | Click dot to select → panel ColorPicker controls that dot |
 | Color picker "Apply to all" | Checkbox below ColorPicker — applies current color to all existing dots |
-| Selection ring color | `var(--primary-color)` (purple) — inline SVG `stroke` so it appears in export |
+| Selection ring | Outer ring rendered as a larger circle (`r = fretpointRadius + 3`) placed behind the dot fill circle — ring is entirely outside the dot so the full dot color is visible |
 | Undo/redo scope | Tracks both `coords[]` and `fretboardConfig` (fret/string count changes included) |
 | Load preset | Restores both dot coords and fretboardConfig |
 | SVG export filename | Dialog pre-filled with last-loaded preset name or `fretboard` — user can rename |
 | Collision on drag | Snap to next available fret on same string in direction of travel; reverse if bounds hit; cancel if none |
 | Resize trim | Dots out of bounds are removed before `setHistory` — not after |
 | Preset overwrite | Saving with a name that already exists in localStorage overwrites that entry |
-| Delete/backspace | Deletes the selected dot when one is selected; no-op otherwise |
+| Delete key | Delete key deletes selected dot; Backspace removed. Delete button in Actions panel also deletes selected dot |
 | Position markers | Repeat every 12 frets via modulo; equal-width frets |
 | Edge cases | Prefer non-destructive behavior; log warning in dev (see CLAUDE.md) |
+| Dot size | `fretpointRadius: 12` (default was 8) — margin in `fretboardHelpers` is now dynamic from config |
+| Layout order | Fretboard on left, controls panel on right |
+| Hit area focus outline | Removed (`outline: none`) — NOTE: this removes WCAG 2.4.7 Focus Visible compliance |
+| Empty cell click (dot selected) | Deselects the current dot — does NOT move it. Tap-to-move mechanic removed. Only drag moves dots |
+| Click outside fretboard | Global `mousedown` listener deselects when clicking outside SVG and outside controls panel |
 
 ---
 
@@ -255,7 +260,7 @@ Guard: if `future` is empty, return. Pop first entry from `future`, push `presen
 | Action | Snapshot contents |
 |---|---|
 | Add dot | new coords + current fretboardConfig |
-| Remove dot (click or Delete/Backspace key) | new coords + current fretboardConfig |
+| Remove dot (click selected dot, Delete key, or Delete button) | new coords + current fretboardConfig |
 | Drag-move release | new coords + current fretboardConfig |
 | Individual dot color change | new coords + current fretboardConfig |
 | Apply-to-all color change | new coords + current fretboardConfig |
@@ -323,7 +328,7 @@ Default dot color at placement time: `getComputedStyle(document.documentElement)
 ### Position markers — repeating via modulo
 
 ```ts
-const SINGLE_MARKER_POSITIONS = new Set([5, 7, 9]);
+const SINGLE_MARKER_POSITIONS = new Set([3, 5, 7, 9]);
 const DOUBLE_MARKER_POSITION = 12;
 
 // For each fret f in [1..numFrets]:
@@ -405,7 +410,7 @@ useEffect(() => {
   const handler = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.shiftKey && e.key === 'Z') { redo(); return; }
     if (e.ctrlKey && e.key === 'z') { undo(); return; }
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedDotId !== null) {
+    if (e.key === 'Delete' && selectedDotId !== null) {
       handleDeleteSelectedDot();
     }
   };
@@ -432,8 +437,7 @@ If a dot exists at `(string, fret)`:
 - If it is a **different dot** → select it (`selectedDotId = that dot's id`). No removal.
 
 If no dot exists at `(string, fret)`:
-- If `selectedDotId !== null` → **move** the selected dot to `(string, fret)`. Update its `string` and `fret`. Push to history. Keep `selectedDotId` unchanged.
-  - Primary movement mechanic on **mobile** (tap-select → tap-destination). Also works on desktop as an alternative to drag.
+- If `selectedDotId !== null` → **deselect** (`selectedDotId = null`). No move, no create.
 - If `selectedDotId === null` → **create** `{ id: crypto.randomUUID(), string, fret, color: resolvedPrimaryColor }`. New dot's `id` becomes `selectedDotId`. Push to history.
 
 **`handleDotSelect(id)`**
@@ -525,6 +529,7 @@ Clone `svgRef.current`. Remove hit area `<rect>` and background deselect `<rect>
 | Presets | `Button` Delete | `handleDeletePreset` |
 | Actions | `Button` Undo (disabled when `!canUndo`) | `undo()` |
 | Actions | `Button` Redo (disabled when `!canRedo`) | `redo()` |
+| Actions | `Button` Delete (disabled when `!selectedDotId`, severity=danger) | `handleDeleteSelectedDot()` |
 | Actions | `Button` Clear All | setHistory with empty coords |
 | Actions | `Button` Export SVG | `handleExportClick` |
 
@@ -687,7 +692,7 @@ No new npm packages required.
 |---|---|---|
 | 1.4.3 Contrast | Text ≥ 4.5:1 | Dot label text color auto-computed from dot luminance (black or white) |
 | 1.4.11 Non-text Contrast | UI components ≥ 3:1 | Selection ring uses `var(--primary-color)` against SVG background |
-| 2.1.1 Keyboard | All functionality keyboard accessible | Hit areas: `role=button` · `tabIndex=0` · `Enter/Space` · `Delete/Backspace` for selected dot |
+| 2.1.1 Keyboard | All functionality keyboard accessible | Hit areas: `role=button` · `tabIndex=0` · `Enter/Space` · `Delete` key for selected dot |
 | 2.4.3 Focus Order | Logical tab order | DOM order: string 1 fret 1 → string 1 fret N → string 2 fret 1… |
 | 2.4.7 Focus Visible | Visible focus indicator | Browser `:focus-visible` ring on hit area `<rect>` |
 | 4.1.2 Name, Role, Value | Accessible names | `aria-label="String {s}, Fret {f} — {state}"` on each hit area |
