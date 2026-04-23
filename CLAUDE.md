@@ -66,8 +66,12 @@ The full architecture and component registry live in `_dev/`. Read those files b
 
 ## Git
 
-- **Never commit to `main`** — always commit to a feature/working branch
-- Before any commit, ask the user to confirm the current branch is correct
+Branch model: `main` → `develop` → feature branches
+
+- **`main`** — stable/release only. Never commit here directly.
+- **`develop`** — integration branch. Triggers GitHub Pages deploy on push. Never commit here directly.
+- **Feature branches** — always branch off `develop`. PR back into `develop` when done.
+- Before any commit, confirm the current branch is a feature branch (not `main` or `develop`)
 - When given the command **"commit all"**: stage all pending changes, confirm the branch with the user, then commit to the current branch
 
 ---
