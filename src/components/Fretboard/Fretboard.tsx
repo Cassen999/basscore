@@ -10,11 +10,12 @@ import { useControls } from "../../contexts/ControlsContext";
 const Fretboard = (props?: iFretboardProps) => {
   const { fretboardConfig } = useControls();
   const { numFrets, numStrings, width, height } = fretboardConfig;
+  const coords = props?.coords;
 
   const fretPoints = useMemo(() => {
-    if (!props?.coords) return [];
-    return mapFretPoints(props.coords, fretboardConfig);
-  }, [props?.coords, numFrets, numStrings]);
+    if (!coords) return [];
+    return mapFretPoints(coords, fretboardConfig);
+  }, [coords, fretboardConfig]);
   
   return (
     <div className="fretboard">

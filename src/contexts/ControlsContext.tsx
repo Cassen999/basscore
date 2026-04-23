@@ -37,7 +37,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
     fretpointRadius: 8,
   });
 
-  const intervalColors: iIntervalColors = {
+  const intervalColors: iIntervalColors = useMemo(() => ({
     root: {
       color: rootColor,
       setColor: setRootColor,
@@ -50,7 +50,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       color: unisonColor,
       setColor: setUnisonColor,
     },
-  };
+  }), [rootColor, intervalColor, unisonColor, setRootColor, setIntervalColor, setUnisonColor]);
 
   const value = useMemo(
     (): iControlsContext => ({
@@ -68,9 +68,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
     }),
     [
       interval,
-      rootColor,
-      intervalColor,
-      unisonColor,
+      intervalColors,
       showUnison,
       displayedScales,
       scaleNoteColor,
@@ -85,6 +83,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useControls = () => {
   const context = useContext(ControlsContext);
   if (!context)
