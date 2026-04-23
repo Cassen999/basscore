@@ -7,9 +7,40 @@ export type tColorType = ColorPickerChangeEvent['value'];
 
 // Fretboard Types
 export interface iCoords {
+  /** UUID — required in Custom Fretboard, optional elsewhere */
+  id?: string;
   string: number;
   fret: number;
+  /** @default var(--primary-color) */
   color: tColorType;
+  /** @default undefined — max 2 characters (e.g. "A#", "Bb", "R", "b7") */
+  label?: string;
+}
+
+export interface iDragState {
+  /** UUID of the dot currently being dragged */
+  dotId: string;
+  previewString: number;
+  previewFret: number;
+  /** @default 1 — direction of travel: +1 = toward bridge, -1 = toward nut */
+  dragDirection: 1 | -1;
+  /** Fret position from the previous mouse move — used to compute dragDirection */
+  prevPreviewFret: number;
+}
+
+export interface iCustomFretboardPreset {
+  /** UUID from crypto.randomUUID() — will serve as DB primary key */
+  id: string;
+  /** User-provided display name */
+  name: string;
+  /** ISO 8601 creation timestamp */
+  createdAt: string;
+  /** ISO 8601 last-updated timestamp */
+  updatedAt: string;
+  /** Full dot state at time of save — id, color, and label included per dot */
+  coords: iCoords[];
+  /** Fretboard config snapshot — restored in full when preset is loaded */
+  fretboardConfig: iFretboardConfig;
 }
 
 export interface iFretboardProps {

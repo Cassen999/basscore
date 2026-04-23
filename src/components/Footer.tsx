@@ -22,7 +22,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="initials">
-        <img src="./images/initials.png" />
+        <img src="/basscore/images/initials.png" alt="Basscore initials" />
       </div>
     </footer>
   );
