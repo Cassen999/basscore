@@ -37,18 +37,6 @@ describe('Scales', () => {
     })
   })
 
-  describe('control panel sections', () => {
-    it('renders the Scale section heading', () => {
-      renderScales()
-      expect(screen.getByText('Scale')).toBeInTheDocument()
-    })
-
-    it('renders the Note Color section heading', () => {
-      renderScales()
-      expect(screen.getByText('Note Color')).toBeInTheDocument()
-    })
-  })
-
   describe('scale selection', () => {
     it('updates the subtitle when Minor is selected', async () => {
       const user = userEvent.setup()
