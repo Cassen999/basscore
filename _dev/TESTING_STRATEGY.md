@@ -110,6 +110,15 @@ All meaningful interactions that affect state or navigation:
 
 Do not test interactions that have no observable effect on the UI or state.
 
+### Keyboard Shortcuts and Window-Level Event Handlers
+When a component registers a `window.addEventListener` (keyboard shortcuts, click-outside deselect, global hotkeys), at least one test must fire that event using `fireEvent` on `window` or `document`. Do not skip these on the grounds that they are "hard to trigger" — they represent real user behavior and are straightforward to test with `fireEvent.keyDown(window, { key: 'z', ctrlKey: true })`.
+
+### Dialog Flows
+When a component contains a dialog, tests must cover the full flow — not just opening it. This includes: submitting the form inside the dialog, cancelling, and any conditional state visible inside the dialog (e.g. overwrite warnings). Opening the dialog is not sufficient coverage on its own.
+
+### Helper and Service Files
+Every file in `src/helpers/` and `src/services/` must have a colocated `.test.ts` file. Each exported function must be tested directly with explicit inputs and expected outputs. These are typically pure functions — do not rely on component tests to exercise them indirectly.
+
 ### Render Tests
 Every page must include render tests verifying:
 - Interactive elements (buttons, inputs, links)
@@ -266,6 +275,6 @@ Plans must be detailed enough to implement with no additional input.
 
 A testing task is complete when:
 1. All tests pass
-2. Coverage thresholds are met
+2. Coverage thresholds are met — run `npm run test:coverage` (not just `test:run`) before closing any testing task. If the file under test has statement or branch coverage below the global threshold, add tests before moving on.
 3. No new test failures are introduced
 4. `testing/TESTING_REPORTS.md` and `testing/FIX_PLANS.md` are up to date
