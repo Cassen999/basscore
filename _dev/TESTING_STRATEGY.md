@@ -110,6 +110,15 @@ All meaningful interactions that affect state or navigation:
 
 Do not test interactions that have no observable effect on the UI or state.
 
+### Keyboard Shortcuts and Window-Level Event Handlers
+When a component registers a `window.addEventListener` (keyboard shortcuts, click-outside deselect, global hotkeys), at least one test must fire that event using `fireEvent` on `window` or `document`. Do not skip these on the grounds that they are "hard to trigger" — they represent real user behavior and are straightforward to test with `fireEvent.keyDown(window, { key: 'z', ctrlKey: true })`.
+
+### Dialog Flows
+When a component contains a dialog, tests must cover the full flow — not just opening it. This includes: submitting the form inside the dialog, cancelling, and any conditional state visible inside the dialog (e.g. overwrite warnings). Opening the dialog is not sufficient coverage on its own.
+
+### Helper and Service Files
+Every file in `src/helpers/` and `src/services/` must have a colocated `.test.ts` file. Each exported function must be tested directly with explicit inputs and expected outputs. These are typically pure functions — do not rely on component tests to exercise them indirectly.
+
 ### Render Tests
 Every page must include render tests verifying:
 - Interactive elements (buttons, inputs, links)
@@ -266,6 +275,63 @@ Plans must be detailed enough to implement with no additional input.
 
 A testing task is complete when:
 1. All tests pass
-2. Coverage thresholds are met
+2. Coverage thresholds are met — run `npm run test:coverage` (not just `test:run`) before closing any testing task. If the file under test has statement or branch coverage below the global threshold, add tests before moving on.
 3. No new test failures are introduced
 4. `testing/TESTING_REPORTS.md` and `testing/FIX_PLANS.md` are up to date
+
+---
+
+## PrimeReact Testing Patterns
+
+### Rule A — Input interaction coverage
+
+Time and text inputs must be tested with focus, type, and blur.
+
+Any component that renders `<input>` elements with `onFocus`, `onChange`, and `onBlur` handlers must have at least one test that triggers all three events in sequence using `userEvent` (click to focus → type → tab/click away to blur). Testing only the rendered value is insufficient.
+
+**Motivation:** `TimerControls.tsx` had three input event handlers at 0% coverage because tests only read initial values and never interacted with the inputs.
+
+---
+
+### Rule B — PrimeReact Dropdown interactions are testable; ColorPicker is not
+
+**Dropdown `onChange` handlers must be tested by clicking the combobox and selecting an option.** PrimeReact Dropdown renders overlay options with `role="option"` — these are accessible and testable.
+
+However, PrimeReact Dropdown `pointer-events: none` in jsdom blocks `userEvent.click`. Use a file-level `vi.mock('primereact/dropdown', ...)` that renders a native `<select>` element, then interact with it via `fireEvent.change`. See `Metronome.test.tsx` for the canonical mock pattern.
+
+**ColorPicker `onChange` handlers are exempt** from the coverage requirement. PrimeReact ColorPicker exposes no accessible interface for its color-picking surface. Mock it with a plain `<button>` and add a test that clicks it if function coverage for the handler is required. Document any permanently untestable handlers in the SKIP table in `testing/TESTING_REPORTS.md`.
+
+---
+
+### Rule C — Pure functions in helpers must be tested for all code paths
+
+Every exported function in `src/helpers/` must have tests that exercise **every reachable branch**. For switch statements, test each `case` that is reachable with valid inputs. `default` branches that are unreachable via TypeScript-constrained inputs are explicitly exempt — document them in the SKIP table in `testing/TESTING_REPORTS.md`.
+
+**Motivation:** `fretpoints.tsx` had functions called (100% function coverage) but 45% branch coverage because component tests only used a subset of input values. A dedicated helper test file with explicit input/output tests for each branch eliminates this gap.
+
+---
+
+### Rule D — Context functions must be tested directly
+
+Every function exposed from a React context must have at least one test that calls it directly through a consumer component. Testing that a UI button calls `start()` is not sufficient if `restart()`, `stop()`, or other context functions are never exercised.
+
+Use an inline `TestConsumer` component inside the test body to access and call context functions:
+
+```tsx
+const TestConsumer = () => {
+  const { restart } = useTimer()
+  return <button onClick={restart}>Restart</button>
+}
+render(<TimerProvider><TestConsumer /></TimerProvider>)
+```
+
+Also test each context hook's error-guard throw (the `if (!context) throw` branch) by rendering the consumer outside its provider:
+
+```ts
+it('throws when useTimer is called outside TimerProvider', () => {
+  const Consumer = () => { useTimer(); return null }
+  expect(() => render(<Consumer />)).toThrow('useTimer must be used within a TimerProvider')
+})
+```
+
+**Motivation:** `TimerContext.tsx` had `restart` at 0% coverage because no component under test ever called it, even though it was exposed in the context value.

@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { Intervals } from './Intervals'
 import { ControlsProvider } from '../../contexts/ControlsContext'
+
+vi.mock('primereact/colorpicker', () => ({
+  ColorPicker: ({ onChange }: { onChange?: (e: { value: string }) => void }) => (
+    <button onClick={() => onChange?.({ value: 'ff0000' })}>Pick Color</button>
+  ),
+}))
 
 const renderIntervals = () =>
   render(
@@ -63,6 +69,22 @@ describe('Intervals', () => {
       renderIntervals()
       await user.click(screen.getByRole('button', { name: '8th' }))
       expect(screen.getByRole('heading', { name: '8th', level: 2 })).toBeInTheDocument()
+    })
+  })
+
+  describe('color and unison controls', () => {
+    it('updates the note color when a color picker fires onChange', async () => {
+      const user = userEvent.setup()
+      renderIntervals()
+      await user.click(screen.getAllByRole('button', { name: 'Pick Color' })[0])
+      expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
+    })
+
+    it('toggles the unison note off when the switch is clicked', async () => {
+      const user = userEvent.setup()
+      renderIntervals()
+      await user.click(screen.getByRole('switch', { name: 'Show/Hide Unison Note' }))
+      expect(screen.getByRole('switch', { name: 'Show/Hide Unison Note' })).toHaveAttribute('aria-checked', 'false')
     })
   })
 
