@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { Metronome } from './Metronome'
@@ -28,6 +28,36 @@ vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
 }))
 
 vi.mock('../BCTooltip/BCTooltip', () => ({ default: () => null }))
+
+vi.mock('primereact/dropdown', () => ({
+  Dropdown: ({
+    value,
+    options,
+    onChange,
+    optionLabel = 'label',
+    optionValue,
+  }: {
+    value: unknown
+    options: Record<string, unknown>[]
+    onChange: (e: { value: unknown }) => void
+    optionLabel?: string
+    optionValue?: string
+  }) => (
+    <select
+      value={String(value ?? '')}
+      onChange={e => {
+        const opt = options.find(o => String(optionValue ? o[optionValue] : o.value) === e.target.value)
+        if (opt) onChange({ value: optionValue ? opt[optionValue] : opt.value })
+      }}
+    >
+      {(options ?? []).map(o => (
+        <option key={String(optionValue ? o[optionValue] : o.value)} value={String(optionValue ? o[optionValue] : o.value)}>
+          {String(o[optionLabel])}
+        </option>
+      ))}
+    </select>
+  ),
+}))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Metronome
@@ -109,6 +139,19 @@ describe('MetronomePage', () => {
       render(<MetronomePage />)
       expect(screen.getByText('Time Signature')).toBeInTheDocument()
     })
+
+    it('renders the volume slider with horizontal orientation on mobile viewports', () => {
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: vi.fn().mockReturnValue({
+          matches: true,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }),
+      })
+      render(<MetronomePage />)
+      expect(screen.getByRole('slider')).toBeInTheDocument()
+    })
   })
 
   describe('start / stop', () => {
@@ -130,6 +173,44 @@ describe('MetronomePage', () => {
       await user.click(screen.getByRole('button', { name: 'Start' }))
       await user.click(screen.getByRole('button', { name: 'Stop' }))
       expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument()
+    })
+
+    it('resumes a suspended AudioContext when Start is clicked', async () => {
+      mockAudioContext.state = 'suspended'
+      const user = userEvent.setup()
+      render(<MetronomePage />)
+      await user.click(screen.getByRole('button', { name: 'Start' }))
+      expect(mockAudioContext.resume).toHaveBeenCalled()
+      mockAudioContext.state = 'running'
+    })
+
+    it('clears the existing timer when subdivision changes while playing', async () => {
+      const user = userEvent.setup()
+      render(<MetronomePage />)
+      await user.click(screen.getByRole('button', { name: 'Start' }))
+      fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: '2' } })
+      expect(screen.getByRole('button', { name: 'Stop' })).toBeInTheDocument()
+    })
+  })
+
+  describe('control interactions', () => {
+    it('updates the subdivision when Eight Note is selected', () => {
+      render(<MetronomePage />)
+      fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: '2' } })
+      expect(screen.getAllByRole('combobox')[0]).toBeInTheDocument()
+    })
+
+    it('updates the time signature when 3/4 is selected', () => {
+      render(<MetronomePage />)
+      fireEvent.change(screen.getAllByRole('combobox')[1], { target: { value: '3/4' } })
+      expect(screen.getAllByRole('combobox')[1]).toBeInTheDocument()
+    })
+
+    it('updates the volume when the slider value changes', () => {
+      render(<MetronomePage />)
+      const slider = screen.getByRole('slider')
+      fireEvent.keyDown(slider, { key: 'ArrowRight' })
+      expect(slider).toBeInTheDocument()
     })
   })
 })

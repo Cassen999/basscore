@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { CustomFretboard } from './CustomFretboard'
 import CustomFretboardEditor from './CustomFretboardEditor'
 import { ControlsProvider } from '../../contexts/ControlsContext'
+import { useControls } from '../../contexts/ControlsContext'
 import * as customFretboardService from '../../services/customFretboardService'
 import type { iCoords, iCustomFretboardPreset, iDragState, iFretboardConfig } from '../../types/types'
 
@@ -24,6 +25,12 @@ vi.mock('../../services/customFretboardService', () => ({
   save: vi.fn(),
   updateById: vi.fn(),
   deleteById: vi.fn(),
+}))
+
+vi.mock('primereact/colorpicker', () => ({
+  ColorPicker: ({ onChange }: { onChange?: (e: { value: string }) => void }) => (
+    <button onClick={() => onChange?.({ value: 'ff0000' })}>Pick Color</button>
+  ),
 }))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -361,6 +368,16 @@ describe('CustomFretboard', () => {
       expect(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'String 2, Fret 2 — empty' })).toBeInTheDocument()
     })
+
+    it('switches selection when a different occupied dot is clicked', async () => {
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' }))
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' }))
+      await user.click(screen.getByRole('button', { name: 'String 2, Fret 2 — empty' }))
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' }))
+      expect(screen.getByPlaceholderText('Label')).toBeInTheDocument()
+    })
   })
 
   describe('string count', () => {
@@ -416,6 +433,18 @@ describe('CustomFretboard', () => {
       fireEvent.keyDown(window, { key: 'Delete' })
       expect(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })).toBeInTheDocument()
     })
+
+    it('does not crash when Ctrl+Z is pressed with no history', () => {
+      renderCustomFretboard()
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true })
+      expect(screen.getByRole('application', { name: 'Custom fretboard editor' })).toBeInTheDocument()
+    })
+
+    it('does not crash when Ctrl+Shift+Z is pressed with nothing to redo', () => {
+      renderCustomFretboard()
+      fireEvent.keyDown(window, { key: 'Z', ctrlKey: true, shiftKey: true })
+      expect(screen.getByRole('application', { name: 'Custom fretboard editor' })).toBeInTheDocument()
+    })
   })
 
   describe('click-outside deselect', () => {
@@ -424,6 +453,15 @@ describe('CustomFretboard', () => {
       renderCustomFretboard()
       await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' }))
       fireEvent.mouseDown(document.body)
+      const actionsGroup = screen.getByText('Actions').closest<HTMLElement>('.control-group')!
+      expect(within(actionsGroup).getByRole('button', { name: 'Delete' })).toBeDisabled()
+    })
+
+    it('deselects a dot when the SVG background is clicked', async () => {
+      const user = userEvent.setup()
+      const { container } = renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' }))
+      fireEvent.click(container.querySelector('.custom-fretboard-editor rect:not([role])')!)
       const actionsGroup = screen.getByText('Actions').closest<HTMLElement>('.control-group')!
       expect(within(actionsGroup).getByRole('button', { name: 'Delete' })).toBeDisabled()
     })
@@ -440,6 +478,21 @@ describe('CustomFretboard', () => {
       fireEvent.mouseMove(svgEl, { clientX: 99, clientY: 128 })
       fireEvent.mouseUp(svgEl)
       expect(screen.getByRole('button', { name: 'String 2, Fret 2 — occupied' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })).toBeInTheDocument()
+    })
+
+    it('moves a dot to the next available fret when dragged onto an occupied cell', async () => {
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' }))
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' }))
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 2 — empty' }))
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 2 — occupied' }))
+      const svgEl = screen.getByRole('application', { name: 'Custom fretboard editor' })
+      fireEvent.mouseDown(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' }))
+      fireEvent.mouseMove(svgEl, { clientX: 99, clientY: 184 })
+      fireEvent.mouseUp(svgEl)
+      expect(screen.getByRole('button', { name: 'String 1, Fret 3 — occupied' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })).toBeInTheDocument()
     })
   })
@@ -511,6 +564,122 @@ describe('CustomFretboard', () => {
       await user.click(screen.getByRole('button', { name: 'Export SVG' }))
       await user.click(screen.getByRole('button', { name: 'Cancel' }))
       expect(createObjectURL).not.toHaveBeenCalled()
+    })
+
+    it('calls URL.createObjectURL when Export is confirmed', async () => {
+      vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:test'), revokeObjectURL: vi.fn() })
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'Export SVG' }))
+      await user.click(screen.getByRole('button', { name: 'Export' }))
+      expect(URL.createObjectURL).toHaveBeenCalledOnce()
+    })
+
+    it('updates the hint text when the filename is changed', async () => {
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'Export SVG' }))
+      await user.clear(screen.getByPlaceholderText('File name'))
+      await user.type(screen.getByPlaceholderText('File name'), 'my-diagram')
+      expect(screen.getByText(/my-diagram\.svg/)).toBeInTheDocument()
+    })
+
+    it('does not call createObjectURL when the Export dialog is dismissed via Escape', async () => {
+      vi.stubGlobal('URL', { createObjectURL: vi.fn(), revokeObjectURL: vi.fn() })
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'Export SVG' }))
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(URL.createObjectURL).not.toHaveBeenCalled()
+    })
+
+    it('calls updateById instead of save when the preset name already exists', async () => {
+      vi.mocked(customFretboardService.getByName).mockReturnValue(stubPreset)
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'Save Preset' }))
+      await user.type(screen.getByPlaceholderText('Preset name'), 'My Preset')
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+      expect(customFretboardService.updateById).toHaveBeenCalledOnce()
+      expect(customFretboardService.save).not.toHaveBeenCalled()
+    })
+  })
+
+  // 1-C-1 and 1-C-2 SKIPPED — PrimeReact Dropdown does not expose option selection
+  // accessibly in jsdom. Neither getByRole('option'), ArrowDown keyDown, nor fireEvent.change
+  // on the hidden native <select> triggers Dropdown's onChange. See testing/TESTING_REPORTS.md.
+
+  describe('fret count', () => {
+    it('increments the fret count when the increment button is clicked', async () => {
+      const user = userEvent.setup()
+      const { container } = renderCustomFretboard()
+      // PrimeReact InputNumber buttons have no accessible aria-label; select by CSS class
+      await user.click(container.querySelector('.p-inputnumber-button-up')!)
+      expect(screen.getByRole('spinbutton')).toHaveValue('13')
+    })
+
+    it('removes a dot at fret 12 when fret count is decremented to 11', async () => {
+      const user = userEvent.setup()
+      const { container } = renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 12 — empty' }))
+      await user.click(container.querySelector('.p-inputnumber-button-down')!)
+      expect(screen.queryByRole('button', { name: /Fret 12/ })).not.toBeInTheDocument()
+    })
+  })
+
+  describe('apply to all', () => {
+    it('changes the color picker label to "Color (All Dots)" when Apply to all is checked', async () => {
+      const user = userEvent.setup()
+      renderCustomFretboard()
+      await user.click(screen.getByLabelText('Apply to all'))
+      expect(screen.getByText('Color (All Dots)')).toBeInTheDocument()
+    })
+  })
+
+  describe('color picker', () => {
+    it('updates scaleNoteColor in context when the color picker fires onChange with no dot selected', async () => {
+      const user = userEvent.setup()
+      const Consumer = () => {
+        const { scaleNoteColor } = useControls()
+        return <span data-testid='scale-color'>{scaleNoteColor as string}</span>
+      }
+      render(
+        <ControlsProvider>
+          <CustomFretboard />
+          <Consumer />
+        </ControlsProvider>
+      )
+      await user.click(screen.getByRole('button', { name: 'Pick Color' }))
+      expect(screen.getByTestId('scale-color')).toHaveTextContent('#ff0000')
+    })
+
+    it('updates the selected dot color when the color picker fires onChange', async () => {
+      const user = userEvent.setup()
+      const { container } = renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' }))
+      await user.click(screen.getByRole('button', { name: 'Pick Color' }))
+      // Deselect to remove the ring circle, leaving only the dot circle to query
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' }))
+      const dotCircle = container.querySelector(
+        'circle:not(.custom-fretboard-editor__position-marker)',
+      )
+      expect(dotCircle).toHaveAttribute('fill', '#ff0000')
+    })
+
+    it('updates all dot colors when Apply to all is checked and the picker fires onChange', async () => {
+      const user = userEvent.setup()
+      const { container } = renderCustomFretboard()
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' }))
+      await user.click(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' }))
+      await user.click(screen.getByRole('button', { name: 'String 2, Fret 2 — empty' }))
+      await user.click(screen.getByLabelText('Apply to all'))
+      await user.click(screen.getByRole('button', { name: 'Pick Color' }))
+      // Deselect to remove the ring circle so only dot circles remain
+      await user.click(screen.getByRole('button', { name: 'String 2, Fret 2 — occupied' }))
+      const dotCircles = container.querySelectorAll(
+        'circle:not(.custom-fretboard-editor__position-marker)',
+      )
+      dotCircles.forEach(c => expect(c).toHaveAttribute('fill', '#ff0000'))
     })
   })
 })
