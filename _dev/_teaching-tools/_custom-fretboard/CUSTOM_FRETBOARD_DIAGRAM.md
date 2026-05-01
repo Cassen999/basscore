@@ -1,6 +1,6 @@
 # Custom Fretboard — Technical Diagram
 
-Lives under **Teaching Tools** in the nav at `/teaching-tools/fretboard`.
+Lives under **Tools** in the nav at `/tools/fretboard`.
 
 ---
 
@@ -20,21 +20,21 @@ flowchart TD
         TYPES["types/types.ts\nupdated iCoords (id?, label, @default color)\n+ iDragState (dotId, dragDirection, prevPreviewFret)\n+ iCustomFretboardPreset"]
         HELPERS["helpers/fretboardHelpers.tsx\n+ snapToCell()\n+ findAvailableFret()"]
         INDEX["styles/index.scss\n+ import customFretboard.scss"]
-        APP["App.tsx\n+ /teaching-tools/fretboard nested route"]
-        HEADER["components/Header.tsx\n+ Teaching Tools dropdown"]
+        APP["App.tsx\n+ /tools/fretboard nested route"]
+        HEADER["components/Header.tsx\n+ Tools dropdown"]
         COMPDOC["_dev/COMPONENTS.md\n+ register new files"]
     end
 ```
 
 ---
 
-## Teaching Tools Nav Structure
+## Tools Nav Structure
 
 ```mermaid
 flowchart TD
     NAV["Header Menubar"]
-    TT["Teaching Tools\n(dropdown trigger — no route)"]
-    FB["Fretboard\n/teaching-tools/fretboard"]
+    TT["Tools\n(dropdown trigger — no route)"]
+    FB["Fretboard\n/tools/fretboard"]
 
     NAV --> Home
     NAV --> Scales

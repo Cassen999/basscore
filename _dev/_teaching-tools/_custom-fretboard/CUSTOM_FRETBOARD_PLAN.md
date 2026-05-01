@@ -1,6 +1,6 @@
 # Custom Fretboard — Implementation Plan
 
-Lives under **Teaching Tools** in the nav. Route: `/teaching-tools/fretboard`.
+Lives under **Tools** in the nav. Route: `/tools/fretboard`.
 
 See [`CUSTOM_FRETBOARD_DIAGRAM.md`](./CUSTOM_FRETBOARD_DIAGRAM.md) for geometry, data flow, and interaction diagrams.
 
@@ -593,7 +593,7 @@ Note: Selection ring `stroke` and dot `fill` are inline SVG attributes set in JS
 ### `src/App.tsx`
 
 ```tsx
-<Route path="/teaching-tools" element={<Outlet />}>
+<Route path="/tools" element={<Outlet />}>
   <Route path="fretboard" element={<CustomFretboard />} />
 </Route>
 ```
@@ -602,9 +602,9 @@ Note: Selection ring `stroke` and dot `fill` are inline SVG attributes set in JS
 
 ```ts
 {
-  label: 'Teaching Tools',
+  label: 'Tools',
   items: [
-    { label: 'Fretboard', url: '/basscore/teaching-tools/fretboard' }
+    { label: 'Fretboard', url: '/basscore/tools/fretboard' }
   ]
 }
 ```
@@ -661,7 +661,7 @@ Purpose: localStorage CRUD for iCustomFretboardPreset[].
 Add `CustomFretboard` to the Pages table:
 
 ```
-| CustomFretboard.tsx | /teaching-tools/fretboard | Custom fretboard builder — per-dot color/label, collision drag, presets, undo/redo, SVG export |
+| CustomFretboard.tsx | /tools/fretboard | Custom fretboard builder — per-dot color/label, collision drag, presets, undo/redo, SVG export |
 ```
 
 ---
@@ -677,8 +677,8 @@ Add `CustomFretboard` to the Pages table:
 [ ] src/pages/CustomFretboard.tsx               create
 [ ] src/styles/customFretboard.scss             create
 [ ] src/styles/index.scss                       import customFretboard.scss
-[ ] src/App.tsx                                 add /teaching-tools/fretboard nested route
-[ ] src/components/Header.tsx                   add Teaching Tools dropdown
+[ ] src/App.tsx                                 add /tools/fretboard nested route
+[ ] src/components/Header.tsx                   add Tools dropdown
 [ ] _dev/COMPONENTS.md                          register all new files
 
 No new npm packages required.
