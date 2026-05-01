@@ -104,7 +104,7 @@ A registry of all existing components, contexts, and hooks. Check here before cr
 | `src/components/Scales/Scales.tsx` | `/scales` | Scale mode learning with fretboard |
 | `src/components/Intervals/Intervals.tsx` | `/intervals` | Interval training with fretboard |
 | `src/components/Metronome/MetronomePage.tsx` | `/metronome` | Metronome controls — renders `<Metronome />` component |
-| `src/components/CustomFretboardEditor/CustomFretboard.tsx` | `/teaching-tools/fretboard` | Custom fretboard builder — per-dot color/label, collision drag, presets, undo/redo, SVG export |
+| `src/components/CustomFretboardEditor/CustomFretboard.tsx` | `/tools/fretboard` | Custom fretboard builder — per-dot color/label, collision drag, presets, undo/redo, SVG export |
 
 ---
 

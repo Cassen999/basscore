@@ -560,7 +560,7 @@ it('hides the sidebar nav links when the sidebar is dismissed via Escape', async
 
 | Lines | Reason |
 |---|---|
-| 33 (Teaching Tools → Fretboard submenu) | PrimeReact Menubar nested submenu requires hover to open; not reliably testable in jsdom |
+| 33 (Tools → Fretboard submenu) | PrimeReact Menubar nested submenu requires hover to open; not reliably testable in jsdom |
 | 110 (Timer `onHide`) | Timer component is a positioned overlay; its `onHide` wiring is an integration concern, not unit-testable here |
 
 ---

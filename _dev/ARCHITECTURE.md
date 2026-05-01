@@ -60,7 +60,7 @@ Defined in `App.tsx`. All routes are children of the `HomeContainer` outlet, whi
 | `/scales` | `Scales` | `src/components/Scales/Scales.tsx` |
 | `/intervals` | `Intervals` | `src/components/Intervals/Intervals.tsx` |
 | `/metronome` | `MetronomePage` | `src/components/Metronome/MetronomePage.tsx` |
-| `/teaching-tools/fretboard` | `CustomFretboard` | `src/components/CustomFretboardEditor/CustomFretboard.tsx` |
+| `/tools/fretboard` | `CustomFretboard` | `src/components/CustomFretboardEditor/CustomFretboard.tsx` |
 
 To add a new route: create a page file inside the appropriate `src/components/<Name>/` folder, add a `<Route>` in `App.tsx`, and add a nav item in `src/components/Header/Header.tsx`.
 
