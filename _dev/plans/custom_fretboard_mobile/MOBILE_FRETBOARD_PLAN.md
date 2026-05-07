@@ -2,7 +2,7 @@
 
 ## Overview
 
-Add a mobile/tablet-optimised experience to the Custom Fretboard page (breakpoint: `lg` / 1024px and below). The fretboard SVG renders with axes swapped so that frets run top-to-bottom and strings run left-to-right (string 1, low E, on the left). Fretpoint interaction switches from click/drag to a long-press model. All controls migrate to a new right-side slide-out menu.
+Add a mobile/tablet-optimised experience to the Custom Fretboard page (breakpoint: `lg` / 1024px and below). The fretboard SVG renders with axes swapped: each string becomes a vertical line (running top-to-bottom, like a real bass neck held vertically), and each fret becomes a horizontal line crossing all strings. Strings are ordered left-to-right across the x-axis (string 1, low E, on the left; string N on the right). Fretpoint interaction switches from click/drag to a long-press model. All controls migrate to a new right-side slide-out menu.
 
 This feature also introduces `AppSidebar` — a reusable slide-out wrapper that will be the shared pattern for all future control panel sidebars across pages.
 
@@ -15,18 +15,16 @@ This feature also introduces `AppSidebar` — a reusable slide-out wrapper that 
 | Question | Decision |
 |---|---|
 | String orientation | String 1 (low E) on the **left**; string N on the right |
-| Cog button placement | **Fixed FAB**, bottom-right of viewport |
+| Cog button placement | **Fixed FAB**, top-right of viewport — directly across from the hamburger nav button |
 | Fretboard dimensions | **Fixed SVG dimensions** using swapped config values (same pattern as Scales/Intervals mobile — no fluid behaviour) |
 | Breakpoint | `lg` (1024px) — covers phones and tablets |
-| Long press on already-active dot | **Cannot occur** — PrimeReact OverlayPanel renders a mask that blocks interaction with elements behind it while the context menu is open |
+| Long press on already-active dot | **Handled explicitly** — OverlayPanel has no mask; the fretboard remains interactive while the menu is open. `onTouchStart` checks `isContextMenuOpen` first and calls `onContextMenuDismiss` if true, closing the menu without starting a timer or placing a dot. |
 | Reusable sidebar | Create new `AppSidebar` component (see Step 5); do not modify `Header.tsx` |
 
 ---
 
 ## Suggestions
 
-- **Haptic feedback**: Call `navigator.vibrate(50)` on long-press activation. One line, no-op on unsupported devices.
-- **Touch target size**: WCAG 2.5.5 recommends minimum 44×44 px touch targets. Consider increasing `fretpointRadius` to 16 in `MOBILE_INITIAL_CONFIG` so dots are easier to press without changing string spacing.
 - **`AppSidebar` for nav sidebar**: The left nav sidebar in `Header.tsx` is a natural candidate to be migrated to `AppSidebar` in a future refactor — outside scope here, but worth noting.
 
 ---
@@ -43,6 +41,7 @@ This feature also introduces `AppSidebar` — a reusable slide-out wrapper that 
 | `src/components/CustomFretboardEditor/FretpointContextMenu.test.tsx` | Component tests |
 | `src/components/CustomFretboardEditor/MobileFretboardMenu.tsx` | Right-side slide-out controls menu for the Custom Fretboard page |
 | `src/components/CustomFretboardEditor/MobileFretboardMenu.test.tsx` | Component tests |
+| `src/components/CustomFretboardEditor/CustomFretboardEditor.test.tsx` | Unit tests for touch logic and axis-swap rendering (new file — editor had no dedicated tests) |
 
 ---
 
@@ -70,6 +69,7 @@ This feature also introduces `AppSidebar` — a reusable slide-out wrapper that 
 - Initialise state from the current `matches` value so the hook is correct on first render.
 - Remove listener on unmount.
 - Named export `useIsMobile`.
+- This is a shared utility hook. Import it from `src/hooks/useIsMobile` wherever mobile detection is needed — it is not scoped to any single component.
 
 **Tests:**
 - Mock `window.matchMedia`.
@@ -105,6 +105,8 @@ onLongPressDot?: (id: string, clientX: number, clientY: number) => void
 onLongPressCell?: (string: number, fret: number, clientX: number, clientY: number) => void
 onTouchTapCell?: (string: number, fret: number) => void
 longPressThreshold?: number
+isContextMenuOpen?: boolean
+onContextMenuDismiss?: () => void
 ```
 
 #### Rotated layout (axis swap)
@@ -132,6 +134,7 @@ Each hit area gains `onTouchStart`, `onTouchMove`, and `onTouchEnd` handlers:
 
 - `onTouchStart(s, f, e)`:
   - `e.preventDefault()` to suppress ghost mouse events.
+  - If `isContextMenuOpen` is true: call `onContextMenuDismiss?.()` and return immediately — no timer started, no dot placed, no callbacks fired. This is the explicit guard that replaces the mask PrimeReact does not provide.
   - Record `touchStartPosRef` from `e.targetTouches[0].clientX/Y`.
   - If the cell is occupied: start timer → fires `onLongPressDot(dot.id, clientX, clientY)`.
   - If the cell is empty: start timer → fires `onLongPressCell(s, f, clientX, clientY)`.
@@ -144,7 +147,19 @@ Each hit area gains `onTouchStart`, `onTouchMove`, and `onTouchEnd` handlers:
   - If cell is **empty** and timer had not fired: call `onTouchTapCell(s, f)`.
   - If cell is **occupied** and timer had not fired: no-op.
 
+**Haptic feedback:** When either long-press timer fires (occupied or empty cell), call `navigator.vibrate(50)` immediately before invoking the callback. This is a progressive enhancement — `navigator.vibrate` is a no-op on unsupported devices (Safari, desktop) and requires no feature-detection guard beyond the existence check: `navigator.vibrate?.(50)`.
+
 **Disable drag on mobile:** When `isMobile=true`, do not attach `onMouseDown` to hit areas.
+
+**Tests (`CustomFretboardEditor.test.tsx` — new file):**
+- `isContextMenuOpen=true`: `onContextMenuDismiss` is called on `touchstart`; no timer is started; no tap/long-press callback fires.
+- Short tap on empty cell fires `onTouchTapCell`; long-press timer does not fire.
+- Long press on empty cell (stationary, timer allowed to fire) calls `onLongPressCell` and `navigator.vibrate`.
+- Movement > 8 px on empty cell cancels the long-press timer.
+- Movement on an occupied cell does not cancel the long-press timer.
+- Long press on occupied cell calls `onLongPressDot` and `navigator.vibrate`.
+- With `rotated=true`: SVG `width` equals `fretboardConfig.height` and `height` equals `fretboardConfig.width`.
+- With `rotated=true`: fret lines have equal `y1`/`y2` (horizontal); string lines have equal `x1`/`x2` (vertical).
 
 ---
 
@@ -172,7 +187,7 @@ onDelete: () => void
 
 - Use PrimeReact `OverlayPanel` with a component `ref`.
 - In a `useEffect` watching `visible` and `anchorEl`: call `overlayRef.current.show(null, anchorEl)` when `visible=true`; call `.hide()` when `visible=false`.
-- OverlayPanel `onHide` → calls `onClose` (handles the built-in outside-click dismissal, which closes the mask and calls this callback).
+- OverlayPanel `onHide` → calls `onClose` (handles the built-in outside-click dismissal — OverlayPanel has no mask, but `dismissable={true}` by default means clicking outside the panel fires `onHide`).
 - Content layout (top to bottom):
   1. Header row: `Button` with `icon='pi pi-times'` aligned to the right (calls `onClose`).
   2. Color row: `ColorPicker` + `Checkbox` labelled "Apply to all".
@@ -253,19 +268,26 @@ onClearAll: () => void
 menuVisible: boolean
 presetsOpen: boolean        // accordion expanded state
 saveInputOpen: boolean      // inline save input visible state
+selectedPresetId: string | null
 ```
+
+`selectedPresetId` is managed locally rather than lifted to `CustomFretboard` — on mobile, selection immediately calls `onLoadPreset` so there is no separate load step requiring parent-level coordination. When a preset is selected: set `selectedPresetId` and call `onLoadPreset(id)`. When a preset is deleted and it was the selected one: clear `selectedPresetId`.
 
 When `AppSidebar`'s `onHide` fires (explicit close via cog toggle or outside click): reset `presetsOpen=false` and `saveInputOpen=false`.
 
 **Cog trigger button:**
 
-Rendered **outside** `AppSidebar`, in the `MobileFretboardMenu` JSX root. Positioned as a fixed FAB (bottom-right of viewport) via CSS class `mobile-fretboard-cog-fab`. Uses PrimeReact `Button` with `icon='pi pi-cog'` and `className='mobile-fretboard-cog-fab'`. The icon colour is set to `var(--primary-color)` in SCSS.
+Rendered **outside** `AppSidebar`, in the `MobileFretboardMenu` JSX root. Positioned as a fixed FAB (top-right of viewport) via CSS class `mobile-fretboard-cog-fab` — mirroring the hamburger button's top-left position so the two controls sit symmetrically at opposite corners of the header row. Uses PrimeReact `Button` with `icon='pi pi-cog'` and `className='mobile-fretboard-cog-fab'`. The icon colour is set to `var(--primary-color)` in SCSS.
 
 Clicking the cog toggles `menuVisible`. While the menu is open, clicking the cog also closes the menu (sets `menuVisible=false`, which propagates as `onHide` through `AppSidebar`).
 
 **Slide-out contents (passed as `children` to `AppSidebar`):**
 
 ```
+[Fret Count label + InputNumber]
+[String Count label + SelectButton: 4 | 5 | 6]
+
+─────────────────────────────────────────
 [Presets accordion row]
   label "Presets"  +  caret icon (rotates on open/close via CSS class)
 
@@ -306,6 +328,7 @@ Bass guitar image is provided by `AppSidebar` automatically.
 - Multiple accordion interactions are independent (no forced single-open behaviour).
 - Dropdown `onChange` calls `onLoadPreset` (no separate load button present).
 - Delete pill calls `onDeletePreset` and does not call `onLoadPreset`.
+- Deleting the currently selected preset clears `selectedPresetId`.
 - Save Preset row toggles inline input.
 - Save button calls `onSavePreset` with trimmed name and collapses input.
 - Cancel collapses input without calling `onSavePreset`.
@@ -323,8 +346,11 @@ Bass guitar image is provided by `AppSidebar` automatically.
 const MOBILE_INITIAL_CONFIG: iFretboardConfig = {
   ...INITIAL_CONFIG,
   numFrets: 7,
+  fretpointRadius: 16,
 };
 ```
+
+`fretpointRadius: 16` satisfies WCAG 2.5.5 (minimum 44×44 px touch target) — the hit area height is `fretpointRadius * 3 = 48 px`, which clears the threshold without changing string spacing.
 
 Choose initial config via `isMobile ? MOBILE_INITIAL_CONFIG : INITIAL_CONFIG`. `useIsMobile` reads `window.matchMedia` synchronously on first render, so this is safe.
 
@@ -367,6 +393,31 @@ contextMenuAnchorEl: HTMLElement | null
 
 **Keyboard listeners:** Retain existing `keydown` listeners for undo/redo/delete (not shown in mobile UI but harmless to keep).
 
+**`handleMobileExport`:**
+
+Add a dedicated mobile export handler that bypasses the dialog entirely:
+```
+handleMobileExport() → exportSvg(lastLoadedPresetName ?? 'fretboard')
+```
+`MobileFretboardMenu` receives `onExportSvg={handleMobileExport}` (not `handleExportClick`). The existing `handleExportClick` → dialog flow is desktop-only and remains unchanged.
+
+**`exportSvg` — iOS Web Share API:**
+
+The existing anchor-click download works on Android Chrome but iOS Safari may preview the SVG inline in a new tab instead of saving it. On mobile, use the Web Share API as the primary path and fall back to the anchor-click if unsupported.
+
+Logic inside `exportSvg` when `isMobile=true`:
+1. Build the SVG string as normal.
+2. Check `navigator.canShare?.({ files: [...] })` — supported on iOS 15.1+ and Android Chrome.
+3. If supported: call `navigator.share({ files: [new File([svgStr], `${fileName}.svg`, { type: 'image/svg+xml' })] })`. This opens the native OS share sheet (iOS: "Save to Files", AirDrop, etc.; Android: standard share targets). No dialog needed — skip `exportDialog` entirely on mobile and call `exportSvg` directly from `onExportSvg`.
+4. If not supported: fall back to the existing anchor-click approach.
+
+The Export SVG Dialog (`exportDialog` state + `<Dialog>`) remains for desktop only. On mobile, the filename defaults to `lastLoadedPresetName ?? 'fretboard'` without prompting, consistent with how the rest of the mobile controls avoid modal dialogs.
+
+**Tests to add for export:**
+- When `isMobile=true` and `navigator.canShare` returns `true`: `navigator.share` is called with a `File` object; anchor-click is not used.
+- When `isMobile=true` and `navigator.canShare` returns `false`: falls back to anchor-click.
+- `exportDialog` is not shown on mobile.
+
 **Render — mobile layout:**
 
 ```jsx
@@ -375,12 +426,6 @@ contextMenuAnchorEl: HTMLElement | null
 
   {/* Mobile layout */}
   <div className='custom-fretboard-page-section custom-fretboard-page-section--mobile'>
-
-    {/* Fret/string counts above the fretboard */}
-    <div className='custom-fretboard-config-row'>
-      <InputNumber ... />      {/* existing fret count element */}
-      <SelectButton ... />     {/* existing string count element */}
-    </div>
 
     {/* Rotated fretboard with nut/bridge labels */}
     <div className='custom-fretboard-editor-wrapper'>
@@ -392,6 +437,8 @@ contextMenuAnchorEl: HTMLElement | null
         onLongPressCell={handleLongPressCell}
         onTouchTapCell={handleTouchTapCell}
         longPressThreshold={longPressThreshold}
+        isContextMenuOpen={contextMenuVisible}
+        onContextMenuDismiss={handleContextMenuClose}
         {/* ...all existing props unchanged */}
       />
       <span className='custom-fretboard-label'>BRIDGE</span>
@@ -426,7 +473,7 @@ contextMenuAnchorEl: HTMLElement | null
       savePresetName={savePresetDialog.name}
       onSavePresetNameChange={name => setSavePresetDialog(prev => ({ ...prev, name }))}
       overwriteWarning={overwriteWarning}
-      onExportSvg={handleExportClick}
+      onExportSvg={handleMobileExport}
       onClearAll={() => { setSelectedDotId(null); setHistory({ coords: [], fretboardConfig: historyConfig }); }}
     />
   </div>
@@ -447,7 +494,7 @@ Note: The Save Preset `Dialog` is replaced on mobile by the inline input inside 
 
 **Tests to add (`CustomFretboard.test.tsx`):**
 - Mock `useIsMobile` to return `true`.
-- Mobile initial fret count is 7.
+- Mobile initial fret count is 7 and fretpointRadius is 16.
 - Tap on empty cell adds a dot with primary purple colour; context menu does not open.
 - Long press on empty cell adds a dot and opens context menu.
 - Long press on existing dot opens context menu without adding new dot.
@@ -455,7 +502,9 @@ Note: The Save Preset `Dialog` is replaced on mobile by the inline input inside 
 - Reset reverts colour and label; context menu remains open.
 - Delete removes dot and closes context menu.
 - Desktop `ControlPanel` is not rendered on mobile.
-- Export SVG Dialog opens from mobile menu callback.
+- Export SVG Dialog is not shown on mobile; `exportSvg` is called directly.
+- Mobile export uses `navigator.share` when `navigator.canShare` returns `true`.
+- Mobile export falls back to anchor-click when `navigator.canShare` returns `false`.
 
 ---
 
@@ -468,16 +517,6 @@ Add the following (do not modify existing selectors):
 .custom-fretboard-page-section--mobile {
   flex-direction: column;
   align-items: center;
-}
-```
-
-**Config row (above fretboard on mobile):**
-```scss
-.custom-fretboard-config-row {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 ```
 
@@ -522,12 +561,12 @@ Add the following (do not modify existing selectors):
 }
 ```
 
-**Cog FAB (fixed, bottom-right of viewport):**
+**Cog FAB (fixed, top-right of viewport):**
 ```scss
 .mobile-fretboard-cog-fab {
   position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
+  top: 1rem;
+  right: 1rem;
   z-index: 1000;
 
   .p-button-icon {

@@ -10,15 +10,12 @@
 `[NEW]` = new file. `[MOD]` = existing file with additions.
 
 ```
+import { useIsMobile } from 'src/hooks/useIsMobile'  ← shared hook, own file,
+                                                         import wherever needed
+
 CustomFretboard [MOD]
 │
-├── useIsMobile [NEW hook]
-│
 │   ── mobile layout (lg and below) ──────────────────────────────────
-│
-├── <div.custom-fretboard-config-row>
-│     ├── InputNumber  (fret count — existing element, no new component)
-│     └── SelectButton (string count — existing element, no new component)
 │
 ├── <div.custom-fretboard-editor-wrapper>
 │     ├── <span.custom-fretboard-label>  "NUT"
@@ -47,7 +44,7 @@ CustomFretboard [MOD]
 ├── <div ref=anchorRef>  (zero-size fixed div — OverlayPanel anchor)
 │
 ├── FretpointContextMenu [NEW]
-│     └── OverlayPanel (PrimeReact — includes mask, blocks fretboard interaction)
+│     └── OverlayPanel (PrimeReact — no mask; fretboard remains interactive)
 │           ├── Button  ✕ close  (top right)
 │           ├── ColorPicker  +  Checkbox "Apply to all"
 │           ├── InputText  (dot label, max 2 chars)
@@ -57,13 +54,16 @@ CustomFretboard [MOD]
 │
 └── MobileFretboardMenu [NEW]
       │
-      ├── Button pi-cog  (class: mobile-fretboard-cog-fab — fixed FAB, bottom-right)
+      ├── Button pi-cog  (class: mobile-fretboard-cog-fab — fixed FAB, top-right)
       │     toggles menuVisible
       │
       └── AppSidebar [NEW]  visible={menuVisible}  position="right"
             │  (wraps PrimeReact Sidebar, class: nav-sidebar)
             │  (automatically appends bass guitar image — same as nav sidebar)
             │
+            ├── InputNumber  (fret count)
+            ├── SelectButton  (string count: 4 | 5 | 6)
+            ├── ──────────────────────────────
             ├── <div.mobile-fretboard-menu__accordion-row>  "Presets" + caret
             │
             └── <div.mobile-fretboard-menu__accordion-body [--open]>
@@ -120,12 +120,13 @@ Do NOT add new dot     (threshold = longPressThreshold ms)
     └── Timer fires
               │
               ▼
+         navigator.vibrate?.(50)  ← haptic feedback (no-op if unsupported)
          onLongPressCell(s, f, clientX, clientY)
          → Add dot (primary purple)
          → setSelectedDotId(newDot.id)
          → Position anchor div at (clientX, clientY)
          → setContextMenuVisible(true)
-         → OverlayPanel opens (with mask)
+         → OverlayPanel opens
 ```
 
 ### 2b — Touch on existing fretpoint
@@ -147,15 +148,17 @@ Record touchStartX/Y
     └── Timer fires
               │
               ▼
+         navigator.vibrate?.(50)  ← haptic feedback (no-op if unsupported)
          onLongPressDot(X, clientX, clientY)
          → setSelectedDotId(X)
          → Position anchor div at (clientX, clientY)
          → setContextMenuVisible(true)
-         → OverlayPanel opens (with mask)
+         → OverlayPanel opens
 
-Note: PrimeReact OverlayPanel renders a mask layer that blocks all
-interaction with the fretboard behind it. A second long-press on the
-active dot while the menu is open cannot occur.
+Note: OverlayPanel has no mask — the fretboard remains interactive while
+the menu is open. This is handled explicitly: onTouchStart checks
+isContextMenuOpen first and calls onContextMenuDismiss if true, closing
+the menu without starting a timer or placing a dot.
 ```
 
 ### 2c — Context menu interactions
@@ -167,7 +170,7 @@ Context menu is open, dot is active
     │         → setContextMenuVisible(false)
     │         → setSelectedDotId(null)
     │
-    ├── Outside click (mask + OverlayPanel.onHide fires)
+    ├── Outside click (OverlayPanel.onHide fires — dismissable=true by default)
     │         → setContextMenuVisible(false)
     │         → setSelectedDotId(null)
     │
@@ -206,11 +209,9 @@ Context menu is open, dot is active
 
 ```
 ┌──────────────────────────────┐
-│          [Header]            │
+│  [☰]                   [⚙]  │  ← hamburger (top-left) / cog FAB (top-right)
 ├──────────────────────────────┤
 │    Custom Fretboard          │
-│                              │
-│  [─ 7 ─]  [4][5][6]         │  ← config row: fret count + string count
 │                              │
 │            NUT               │
 │  ┌────────────────────────┐  │
@@ -230,8 +231,6 @@ Context menu is open, dot is active
 │  │                        │  │  ← fret 7 line
 │  └────────────────────────┘  │
 │           BRIDGE             │
-│                              │
-│                        [⚙]  │  ← cog FAB (fixed, bottom-right viewport)
 └──────────────────────────────┘
 
 Axis reference:
@@ -243,8 +242,11 @@ Axis reference:
 
 ```
 ┌───────────┬──────────────────────────┐
-│           │  ┌──────────────────┐    │
-│           │  │  Presets     ▲   │    │  ← accordion header (open)
+│           │  [─ 7 ─]             │    │  ← fret count (InputNumber)
+│           │  [4][5][6]           │    │  ← string count (SelectButton)
+│           │  ────────────────────│    │
+│           │  ┌──────────────────┐│    │
+│           │  │  Presets     ▲   ││    │  ← accordion header (open)
 │  Fretboard│  ├──────────────────┤    │
 │  area     │  │  Save Preset     │    │  ← save preset toggle row
 │  (visible │  │ ┌──────────────┐ │    │
@@ -285,9 +287,10 @@ Anchored to zero-size div positioned at long-press clientX/Y
         │  [Reset]        [Delete]     │
         │                              │
         └──────────────────────────────┘
-           ↑ OverlayPanel with mask
-             Mask blocks all fretboard interaction while open
+           ↑ OverlayPanel (no mask — dismissable=true)
              Outside click → OverlayPanel.onHide → handleContextMenuClose
+             Fretboard touch while open → onTouchStart isContextMenuOpen
+             guard → onContextMenuDismiss (no dot placed, no timer)
 ```
 
 ### 3d — AppSidebar component boundary
@@ -323,10 +326,10 @@ Touch lands on a hit area
          ▼
 ┌─────────────────────────────────────────────────────┐
 │  Priority 1 — Context menu is open                  │
-│    Any touch on the fretboard closes the menu and   │
-│    deactivates the dot. No new dot is added.         │
-│    (OverlayPanel mask also prevents direct           │
-│     fretboard touches while menu is open)            │
+│    onTouchStart checks isContextMenuOpen first.      │
+│    Calls onContextMenuDismiss and returns — menu     │
+│    closes, dot deactivates, no timer, no new dot.    │
+│    (OverlayPanel has no mask; this is explicit)      │
 └────────────────────┬────────────────────────────────┘
                      │ (menu is closed)
                      ▼
