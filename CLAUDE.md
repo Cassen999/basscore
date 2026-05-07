@@ -106,13 +106,13 @@ Do not silently comply with something that violates best practices.
 
 ## Testing
 
-The full testing strategy lives in `_dev/TESTING_STRATEGY.md`. Read it before writing or running tests.
+The full testing strategy lives in `_dev/plans/testing/TESTING_STRATEGY.md`. Read it before writing or running tests.
 
 - Test files are colocated with the component: `<ComponentName>.test.tsx`
 - Tests use **Vitest** + **React Testing Library** + **userEvent**
 - Run `npm run test:run`, `npm run lint`, and `npm run build` before every commit — do not commit if any of them fail
 - Run `npm run test:coverage` before closing any testing task — if the file under test is below the global thresholds, add tests before moving on
-- If tests fail, generate a report in `testing/TESTING_REPORTS.md` and a fix plan in `testing/FIX_PLANS.md` immediately
+- If tests fail, generate a report in `_dev/plans/testing/TESTING_REPORTS.md` and a fix plan in `_dev/plans/testing/FIX_PLANS.md` immediately
 - Only implement a fix plan when explicitly instructed
 
 When a new component, page, hook, or service is added, a corresponding test file must be created alongside it.
