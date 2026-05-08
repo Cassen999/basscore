@@ -44,9 +44,11 @@ CustomFretboard [MOD]
 ├── <div ref=anchorRef>  (zero-size fixed div — OverlayPanel anchor)
 │
 ├── FretpointContextMenu [NEW]
-│     └── OverlayPanel (PrimeReact — no mask; fretboard remains interactive)
-│           ├── Button  ✕ close  (top right)
-│           ├── ColorPicker  +  Checkbox "Apply to all"
+│     └── OverlayPanel (PrimeReact — no mask; dismissable=false)
+│           ├── <div.fretpoint-context-menu__header>
+│           │     ├── <h3> "Dot Settings"  (left)
+│           │     └── Button  ✕ close      (right, calls onClose)
+│           ├── ColorPicker (key=dot.id)  +  Checkbox "Apply to all"
 │           ├── InputText  (dot label, max 2 chars)
 │           └── <div.fretpoint-context-menu__actions>
 │                 ├── Button "Reset"   (secondary/text)
@@ -67,20 +69,20 @@ CustomFretboard [MOD]
             ├── <div.mobile-fretboard-menu__accordion-row>  "Presets" + caret
             │
             └── <div.mobile-fretboard-menu__accordion-body [--open]>
+                  │   (padding-left + padding-bottom: 0.5rem when open)
                   │
-                  ├── <div.mobile-fretboard-menu__accordion-row>  "Save Preset"
+                  ├── <div.mobile-fretboard-menu__preset-list>
+                  │     [preset name text ────── Button pi-trash (danger, small, text)]
+                  │     click item → onLoadPreset (auto-load, no separate button)
+                  │     delete button → e.stopPropagation() + onDeletePreset
+                  │     empty state → "No Saved Presets" text
                   │
-                  ├── <div.mobile-fretboard-menu__accordion-body [--open]>
-                  │     ├── InputText  (preset name)
-                  │     ├── <p> overwrite warning  (conditional)
-                  │     └── Button "Cancel"  +  Button "Save"
+                  ├── Button "Save Preset"  (primary, aria-expanded={saveInputOpen})
                   │
-                  ├── ──────────────────────────────
-                  │
-                  └── Dropdown  (itemTemplate per option)
-                        [preset name text ────── Button pi-trash (danger, small)]
-                        onChange → onLoadPreset (auto-load, no separate button)
-                        delete pill → e.stopPropagation() + onDeletePreset
+                  └── <div.mobile-fretboard-menu__save-input-area>  (conditional)
+                        ├── InputText  (preset name, background: gray650)
+                        ├── <p> overwrite warning  (conditional)
+                        └── Button "Cancel"  +  Button "Save"
 
               ── (after accordion body) ──
               Button "Export SVG"
@@ -170,7 +172,8 @@ Context menu is open, dot is active
     │         → setContextMenuVisible(false)
     │         → setSelectedDotId(null)
     │
-    ├── Outside click (OverlayPanel.onHide fires — dismissable=true by default)
+    ├── Outside click (mousedown on any element outside .p-overlaypanel)
+    │   (CustomFretboard mousedown handler — OverlayPanel is dismissable=false)
     │         → setContextMenuVisible(false)
     │         → setSelectedDotId(null)
     │
@@ -179,9 +182,15 @@ Context menu is open, dot is active
     │         → Close menu + deactivate
     │         → Do NOT add new dot
     │
-    ├── ColorPicker change
+    ├── "Apply to all" checkbox toggled ON
+    │         → handleApplyToAllChange(true)
+    │         → setApplyToAll(true)
+    │         → Immediately maps all coords to active dot's current color
+    │         → Menu stays open
+    │
+    ├── ColorPicker change (while applyToAll=true)
     │         → handleColorChange(color)
-    │         → applyToAll=true: update all dots
+    │         → applyToAll=true: update all dots to new color
     │         → applyToAll=false: update active dot only
     │         → Menu stays open
     │
@@ -248,16 +257,15 @@ Axis reference:
 │           │  ┌──────────────────┐│    │
 │           │  │  Presets     ▲   ││    │  ← accordion header (open)
 │  Fretboard│  ├──────────────────┤    │
-│  area     │  │  Save Preset     │    │  ← save preset toggle row
-│  (visible │  │ ┌──────────────┐ │    │
-│  behind   │  │ │ preset name  │ │    │  ← inline input (visible)
-│  overlay) │  │ └──────────────┘ │    │
+│  area     │  │  My preset  [🗑] │    │  ← preset list (above save button)
+│  (visible │  │  Bass run   [🗑] │    │
+│  behind   │  ├──────────────────┤    │
+│  overlay) │  │ [Save Preset]    │    │  ← primary Button (toggles save input)
+│           │  │ ┌──────────────┐ │    │
+│           │  │ │ preset name  │ │    │  ← inline input (gray650 bg, visible)
+│           │  │ └──────────────┘ │    │
 │           │  │ ⚠ Overwrites...  │    │  ← overwrite warning (conditional)
 │           │  │ [Cancel] [Save]  │    │
-│           │  ├──────────────────┤    │
-│           │  │ [Select preset ▼]│    │
-│           │  │ My preset   [🗑] │    │  ← itemTemplate: name + trash pill
-│           │  │ Bass run    [🗑] │    │
 │           │  └──────────────────┘    │
 │           │                          │
 │           │  [Export SVG]            │
@@ -275,7 +283,7 @@ Axis reference:
 ```
 Anchored to zero-size div positioned at long-press clientX/Y
 
-        ┌──────────────────────────[✕]─┐
+        ┌─ Dot Settings ───────────[✕]─┐
         │                              │
         │  ● [color swatch]            │
         │    ☐ Apply to all            │
@@ -287,10 +295,11 @@ Anchored to zero-size div positioned at long-press clientX/Y
         │  [Reset]        [Delete]     │
         │                              │
         └──────────────────────────────┘
-           ↑ OverlayPanel (no mask — dismissable=true)
-             Outside click → OverlayPanel.onHide → handleContextMenuClose
+           ↑ OverlayPanel (no mask — dismissable=false)
+             Outside click → mousedown handler in CustomFretboard
+               → setContextMenuVisible(false) + setSelectedDotId(null)
              Fretboard touch while open → onTouchStart isContextMenuOpen
-             guard → onContextMenuDismiss (no dot placed, no timer)
+               guard → onContextMenuDismiss (no dot placed, no timer)
 ```
 
 ### 3d — AppSidebar component boundary
@@ -305,7 +314,8 @@ AppSidebar  (src/components/AppSidebar/AppSidebar.tsx)
   │  {children}               ← caller controls this area  │
   │  ─────────────────────────────────────────────────────  │
   │  <div.nav-sidebar__img-container>                       │
-  │    <img.nav-sidebar__img  src="bass-guitar.png" />      │
+  │    <img.nav-sidebar__img                                │
+  │         src={`${import.meta.env.BASE_URL}images/...`}  │
   │  </div>                   ← always present              │
   └────────────────────────────────────────────────────────┘
 

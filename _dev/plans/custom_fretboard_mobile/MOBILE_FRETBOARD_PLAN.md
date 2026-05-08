@@ -174,7 +174,6 @@ dot: iCoords | null
 visible: boolean
 anchorEl: HTMLElement | null        // zero-size div positioned at long-press clientX/Y (see Step 6)
 applyToAll: boolean
-resolvedPrimaryColor: string
 onClose: () => void
 onColorChange: (color: string) => void
 onApplyToAllChange: (val: boolean) => void
@@ -183,17 +182,20 @@ onReset: () => void
 onDelete: () => void
 ```
 
+Note: `resolvedPrimaryColor` is **not** a prop. Reset behaviour is handled entirely by `handleMobileReset` in `CustomFretboard.tsx` and exposed via `onReset`.
+
 **Implementation:**
 
 - Use PrimeReact `OverlayPanel` with a component `ref`.
 - In a `useEffect` watching `visible` and `anchorEl`: call `overlayRef.current.show(null, anchorEl)` when `visible=true`; call `.hide()` when `visible=false`.
-- OverlayPanel `onHide` → calls `onClose` (handles the built-in outside-click dismissal — OverlayPanel has no mask, but `dismissable={true}` by default means clicking outside the panel fires `onHide`).
+- Set `dismissable={false}` on the OverlayPanel. On mobile, PrimeReact's built-in outside-click detection synthesises events that can fire before button `click` handlers, causing all in-panel actions to silently fail. Outside-click dismissal is instead managed by the `mousedown` handler in `CustomFretboard.tsx` (see Step 7).
+- OverlayPanel `onHide` → calls `onClose` (handles programmatic hide triggered by the useEffect).
 - Content layout (top to bottom):
-  1. Header row: `Button` with `icon='pi pi-times'` aligned to the right (calls `onClose`).
-  2. Color row: `ColorPicker` + `Checkbox` labelled "Apply to all".
+  1. Header row: `<h3>` "Dot Settings" title (left) + `Button` with `icon='pi pi-times'` (right, calls `onClose`). Use `justify-content: space-between`.
+  2. Color row: `ColorPicker` (value stripped of `#`; `key={dot?.id}` to remount on dot change) + `Checkbox` labelled "Apply to all".
   3. `InputText` for label (max 2 chars, `maxLength={2}`). Only render when `dot` is non-null.
   4. Action row: `Button` "Reset" (text/secondary severity) + `Button` "Delete" (danger severity).
-- **Reset**: calls `onColorChange(resolvedPrimaryColor)` and `onLabelChange('')`. Does **not** call `onClose`.
+- **Reset**: calls `onReset()`. `handleMobileReset` in the parent reverts color to `resolvedPrimaryColor` and clears label. Does **not** call `onClose`.
 - Apply class `fretpoint-context-menu` to the OverlayPanel for SCSS targeting.
 
 **Tests (`FretpointContextMenu.test.tsx`):**
@@ -203,7 +205,7 @@ onDelete: () => void
 - ColorPicker change calls `onColorChange`.
 - Apply-to-all checkbox calls `onApplyToAllChange`.
 - Label input enforces max 2 chars and calls `onLabelChange`.
-- Reset calls `onColorChange(resolvedPrimaryColor)` and `onLabelChange('')` but NOT `onClose`.
+- Reset calls `onReset` but NOT `onClose`.
 - Delete calls `onDelete`.
 
 ---
@@ -284,7 +286,7 @@ Clicking the cog toggles `menuVisible`. While the menu is open, clicking the cog
 **Slide-out contents (passed as `children` to `AppSidebar`):**
 
 ```
-[Fret Count label + InputNumber]
+[Fret Count label + InputNumber (class: custom-fretboard-fret-count — constrained to 2-digit width)]
 [String Count label + SelectButton: 4 | 5 | 6]
 
 ─────────────────────────────────────────
@@ -292,25 +294,27 @@ Clicking the cog toggles `menuVisible`. While the menu is open, clicking the cog
   label "Presets"  +  caret icon (rotates on open/close via CSS class)
 
   [accordion body — slide-down, visible when presetsOpen=true]
+    [padding-left: 0.5rem, padding-bottom: 0.5rem when open]
 
-    [Save Preset toggle row]
-      label "Save Preset"
+    [Preset list — rendered ABOVE Save Preset button]
+      Each item: [preset name text ────── Button pi-trash (danger, small, text)]
+      Clicking item → setSelectedPresetId + onLoadPreset(id)
+      Delete button: e.stopPropagation(), then onDeletePreset(id)
+      Empty state: "No Saved Presets" text
 
-      [inline input area — slide-down, visible when saveInputOpen=true]
-        InputText (placeholder="Preset name")
+    Button "Save Preset"  (primary, no severity — triggers saveInputOpen toggle)
+      aria-expanded={saveInputOpen}
+
+      [inline input area — conditional render, visible when saveInputOpen=true]
+        InputText (placeholder="Preset name", background: map.get($colors, 'gray650'))
         overwrite warning text (conditional)
-        Button "Cancel"    Button "Save" (disabled if name empty)
-
-    ─────────────────────────────────────────
-    Dropdown
-      itemTemplate per option:
-        [preset name text ────────────── Button pi-trash (danger, small)]
-        Delete button: e.stopPropagation(), then onDeletePreset(id)
-      onChange: onLoadPreset(e.value)  ← auto-load on selection, no Load button
+        Button "Cancel" (secondary)    Button "Save" (disabled if name empty)
 
 [Export SVG button]
 [Clear All button]
 ```
+
+Note: The preset list uses a custom list with per-item trash buttons — not a PrimeReact `Dropdown`.
 
 Bass guitar image is provided by `AppSidebar` automatically.
 
@@ -326,10 +330,10 @@ Bass guitar image is provided by `AppSidebar` automatically.
 - Cog button while open closes the sidebar.
 - Presets row click expands accordion; second click collapses.
 - Multiple accordion interactions are independent (no forced single-open behaviour).
-- Dropdown `onChange` calls `onLoadPreset` (no separate load button present).
-- Delete pill calls `onDeletePreset` and does not call `onLoadPreset`.
+- Clicking a preset item calls `onLoadPreset` (no separate load button).
+- Delete button calls `onDeletePreset` and does not call `onLoadPreset`.
 - Deleting the currently selected preset clears `selectedPresetId`.
-- Save Preset row toggles inline input.
+- Clicking "Save Preset" button toggles inline input (tested via `fireEvent.click`).
 - Save button calls `onSavePreset` with trimmed name and collapses input.
 - Cancel collapses input without calling `onSavePreset`.
 - Export SVG button calls `onExportSvg`.
@@ -390,6 +394,12 @@ contextMenuAnchorEl: HTMLElement | null
 - Revert active dot color to `resolvedPrimaryColor` and clear its label.
 - `setHistory(...)` with updated coords.
 - Does not touch `contextMenuVisible` or `selectedDotId`.
+
+`handleApplyToAllChange(val: boolean)`:
+- Calls `setApplyToAll(val)`.
+- When `val=true` and a dot is selected: immediately maps all coords to the active dot's current color and calls `setHistory(...)`. This gives immediate visual feedback at toggle time.
+- When `val=false`: only clears the flag, no coord mutation.
+- Passed as `onApplyToAllChange` to `FretpointContextMenu` (replaces the bare `setApplyToAll`).
 
 **Keyboard listeners:** Retain existing `keydown` listeners for undo/redo/delete (not shown in mobile UI but harmless to keep).
 
@@ -452,10 +462,9 @@ The Export SVG Dialog (`exportDialog` state + `<Dialog>`) remains for desktop on
       visible={contextMenuVisible}
       anchorEl={contextMenuAnchorEl}
       applyToAll={applyToAll}
-      resolvedPrimaryColor={resolvedPrimaryColor}
       onClose={handleContextMenuClose}
       onColorChange={handleColorChange}
-      onApplyToAllChange={setApplyToAll}
+      onApplyToAllChange={handleApplyToAllChange}
       onLabelChange={label => selectedDotId && handleDotLabelChange(selectedDotId, label)}
       onReset={handleMobileReset}
       onDelete={handleDeleteSelectedDot}
@@ -550,7 +559,15 @@ Add the following (do not modify existing selectors):
 .fretpoint-context-menu {
   &__header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0;        // reset default h3 margin
   }
 
   &__actions {
@@ -600,6 +617,24 @@ Add the following (do not modify existing selectors):
 
   &--open {
     max-height: 600px;
+    padding-left: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+// Save preset input area
+.mobile-fretboard-menu__save-input-area {
+  margin-top: 0.5rem;
+
+  .p-inputtext {
+    background: map.get($colors, 'gray650');
+    color: $primary-text;
+    margin: 3px;       // prevents focus ring from being clipped by overflow: hidden
+    width: calc(100% - 6px);
+
+    &::placeholder {
+      color: $secondary-text;
+    }
   }
 }
 ```

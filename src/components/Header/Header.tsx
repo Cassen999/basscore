@@ -96,7 +96,7 @@ export const Header = () => {
         </div>
         <SidebarControls />
         <div className='nav-sidebar__img-container'>
-          <img src='images/bass-guitar.png' alt='Bass guitar' className='nav-sidebar__img' />
+          <img src={`${import.meta.env.BASE_URL}images/bass-guitar.png`} alt='Bass guitar' className='nav-sidebar__img' />
         </div>
       </Sidebar>
       <div className='logo-container'>
