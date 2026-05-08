@@ -9,11 +9,14 @@ import { InputText } from 'primereact/inputtext';
 import { SelectButton } from 'primereact/selectbutton';
 import { useControls } from '../../contexts/ControlsContext';
 import { useCustomFretboardHistory } from '../../hooks/useCustomFretboardHistory';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import * as customFretboardService from '../../services/customFretboardService';
 import type { iCoords, iControlElementGroups, iCustomFretboardPreset, iDragState, iFretboardConfig } from '../../types/types';
 import { findAvailableFret, snapToCell } from '../../helpers/fretboardHelpers';
 import ControlPanel from '../ControlPanel/ControlPanel';
 import CustomFretboardEditor from './CustomFretboardEditor';
+import FretpointContextMenu from './FretpointContextMenu';
+import MobileFretboardMenu from './MobileFretboardMenu';
 
 const INITIAL_CONFIG: iFretboardConfig = {
   width: 700,
@@ -21,6 +24,12 @@ const INITIAL_CONFIG: iFretboardConfig = {
   numFrets: 12,
   numStrings: 4,
   fretpointRadius: 12,
+};
+
+const MOBILE_INITIAL_CONFIG: iFretboardConfig = {
+  ...INITIAL_CONFIG,
+  numFrets: 7,
+  fretpointRadius: 16,
 };
 
 const STRING_COUNT_OPTIONS = [
@@ -33,11 +42,12 @@ const trimCoords = (c: iCoords[], config: iFretboardConfig): iCoords[] =>
   c.filter(dot => dot.fret <= config.numFrets && dot.string <= config.numStrings);
 
 export const CustomFretboard = () => {
-  const { setFretboardConfig, scaleNoteColor, setScaleNoteColor } = useControls();
+  const { setFretboardConfig, scaleNoteColor, setScaleNoteColor, longPressThreshold } = useControls();
+  const isMobile = useIsMobile();
 
   const { present, setHistory, undo, redo, canUndo, canRedo } = useCustomFretboardHistory({
     coords: [],
-    fretboardConfig: INITIAL_CONFIG,
+    fretboardConfig: isMobile ? MOBILE_INITIAL_CONFIG : INITIAL_CONFIG,
   });
   const { coords, fretboardConfig: historyConfig } = present;
 
@@ -50,8 +60,13 @@ export const CustomFretboard = () => {
   const [savePresetDialog, setSavePresetDialog] = useState({ visible: false, name: '' });
   const [exportDialog, setExportDialog] = useState({ visible: false, fileName: 'fretboard' });
 
+  // Mobile-specific state
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuAnchorEl, setContextMenuAnchorEl] = useState<HTMLElement | null>(null);
+
   const svgRef = useRef<SVGSVGElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setFretboardConfig(historyConfig);
@@ -61,6 +76,7 @@ export const CustomFretboard = () => {
     if (!selectedDotId) return;
     const newCoords = coords.filter(d => d.id !== selectedDotId);
     setSelectedDotId(null);
+    setContextMenuVisible(false);
     setHistory({ coords: newCoords, fretboardConfig: historyConfig });
   }, [selectedDotId, coords, historyConfig, setHistory]);
 
@@ -89,9 +105,10 @@ export const CustomFretboard = () => {
       if (svgRef.current?.contains(target)) return;
       if (controlsRef.current?.contains(target)) return;
       const isInOverlay = !!(target as Element).closest?.(
-        '.p-colorpicker-panel, .p-dropdown-panel, .p-dialog, .p-dialog-mask, .p-dialog-content',
+        '.p-colorpicker-panel, .p-dropdown-panel, .p-dialog, .p-dialog-mask, .p-dialog-content, .p-overlaypanel',
       );
       if (isInOverlay) return;
+      setContextMenuVisible(false);
       setSelectedDotId(null);
     };
     window.addEventListener('mousedown', handler);
@@ -242,18 +259,18 @@ export const CustomFretboard = () => {
   const handleOpenSaveModal = () =>
     setSavePresetDialog({ visible: true, name: lastLoadedPresetName ?? '' });
 
-  const handleConfirmSave = () => {
-    const name = savePresetDialog.name.trim();
-    if (!name) return;
-    const existing = customFretboardService.getByName(name);
+  const handleConfirmSave = (name?: string) => {
+    const saveName = (name ?? savePresetDialog.name).trim();
+    if (!saveName) return;
+    const existing = customFretboardService.getByName(saveName);
     if (existing) {
       customFretboardService.updateById(existing.id, {
         coords,
         fretboardConfig: historyConfig,
-        name,
+        name: saveName,
       });
     } else {
-      customFretboardService.save({ name, coords, fretboardConfig: historyConfig });
+      customFretboardService.save({ name: saveName, coords, fretboardConfig: historyConfig });
     }
     setPresets(customFretboardService.getAll());
     setSavePresetDialog({ visible: false, name: '' });
@@ -276,7 +293,7 @@ export const CustomFretboard = () => {
   const handleExportClick = () =>
     setExportDialog({ visible: true, fileName: lastLoadedPresetName ?? 'fretboard' });
 
-  const exportSvg = (fileName: string) => {
+  const exportSvg = async (fileName: string) => {
     const svg = svgRef.current;
     if (!svg) return;
 
@@ -302,6 +319,12 @@ export const CustomFretboard = () => {
     clone.insertBefore(defs, clone.firstChild);
 
     const svgStr = new XMLSerializer().serializeToString(clone);
+
+    if (isMobile && navigator.canShare?.({ files: [new File([svgStr], `${fileName}.svg`, { type: 'image/svg+xml' })] })) {
+      await navigator.share({ files: [new File([svgStr], `${fileName}.svg`, { type: 'image/svg+xml' })] });
+      return;
+    }
+
     const blob = new Blob([svgStr], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -314,7 +337,78 @@ export const CustomFretboard = () => {
     setExportDialog({ visible: false, fileName: 'fretboard' });
   };
 
-  const selectedDot = coords.find(d => d.id === selectedDotId);
+  const handleMobileExport = () => exportSvg(lastLoadedPresetName ?? 'fretboard');
+
+  // Mobile context menu handlers
+  const positionAnchor = (clientX: number, clientY: number) => {
+    if (!anchorRef.current) return;
+    anchorRef.current.style.left = `${clientX}px`;
+    anchorRef.current.style.top = `${clientY}px`;
+  };
+
+  const handleTouchTapCell = (string: number, fret: number) => {
+    if (contextMenuVisible) {
+      setContextMenuVisible(false);
+      setSelectedDotId(null);
+      return;
+    }
+    const newDot: iCoords = {
+      id: crypto.randomUUID(),
+      string,
+      fret,
+      color: resolvedPrimaryColor,
+    };
+    setHistory({ coords: [...coords, newDot], fretboardConfig: historyConfig });
+  };
+
+  const handleLongPressCell = (string: number, fret: number, clientX: number, clientY: number) => {
+    const newDot: iCoords = {
+      id: crypto.randomUUID(),
+      string,
+      fret,
+      color: resolvedPrimaryColor,
+    };
+    setHistory({ coords: [...coords, newDot], fretboardConfig: historyConfig });
+    setSelectedDotId(newDot.id!);
+    positionAnchor(clientX, clientY);
+    setContextMenuAnchorEl(anchorRef.current);
+    setContextMenuVisible(true);
+  };
+
+  const handleLongPressDot = (id: string, clientX: number, clientY: number) => {
+    setSelectedDotId(id);
+    positionAnchor(clientX, clientY);
+    setContextMenuAnchorEl(anchorRef.current);
+    setContextMenuVisible(true);
+  };
+
+  const handleContextMenuClose = () => {
+    setContextMenuVisible(false);
+    setSelectedDotId(null);
+  };
+
+  const handleMobileReset = () => {
+    if (!selectedDotId) return;
+    const newCoords = coords.map(d =>
+      d.id === selectedDotId ? { ...d, color: resolvedPrimaryColor, label: undefined } : d,
+    );
+    setHistory({ coords: newCoords, fretboardConfig: historyConfig });
+  };
+
+  const handleApplyToAllChange = (val: boolean) => {
+    setApplyToAll(val);
+    if (val && selectedDotId) {
+      const activeDot = coords.find(d => d.id === selectedDotId);
+      if (activeDot) {
+        setHistory({
+          coords: coords.map(d => ({ ...d, color: activeDot.color })),
+          fretboardConfig: historyConfig,
+        });
+      }
+    }
+  };
+
+  const selectedDot = coords.find(d => d.id === selectedDotId) ?? null;
 
   const colorPickerLabel = useMemo(() => {
     if (applyToAll) return 'Color (All Dots)';
@@ -326,9 +420,15 @@ export const CustomFretboard = () => {
     ? (selectedDot.color as string)
     : (scaleNoteColor as string);
 
-  const overwriteWarning =
+  const overwriteWarning = !!(
     savePresetDialog.name.trim() &&
-    customFretboardService.getByName(savePresetDialog.name.trim()) !== undefined;
+    customFretboardService.getByName(savePresetDialog.name.trim()) !== undefined
+  );
+
+  const mobileOverwriteWarning = !!(
+    savePresetDialog.name.trim() &&
+    customFretboardService.getByName(savePresetDialog.name.trim()) !== undefined
+  );
 
   const presetOptions = presets.map(p => ({ label: p.name, value: p.id }));
 
@@ -457,90 +557,165 @@ export const CustomFretboard = () => {
     <div className='custom-fretboard-container'>
       <h1 className='page-title'>Custom Fretboard</h1>
 
-      <div className='custom-fretboard-page-section'>
-        <div className='page-subsection'>
-          <CustomFretboardEditor
+      {/* Mobile layout */}
+      {isMobile && (
+        <div className='custom-fretboard-page-section custom-fretboard-page-section--mobile'>
+          <div className='custom-fretboard-editor-wrapper'>
+            <span className='custom-fretboard-label'>NUT</span>
+            <CustomFretboardEditor
+              coords={coords}
+              fretboardConfig={historyConfig}
+              dragState={dragState}
+              selectedDotId={selectedDotId}
+              resolvedPrimaryColor={resolvedPrimaryColor}
+              svgRef={svgRef}
+              onCellClick={handleCellClick}
+              onDotMouseDown={handleDotMouseDown}
+              onSvgMouseMove={handleSvgMouseMove}
+              onSvgMouseUp={handleSvgMouseUp}
+              onBackgroundClick={handleBackgroundClick}
+              rotated
+              isMobile
+              onLongPressDot={handleLongPressDot}
+              onLongPressCell={handleLongPressCell}
+              onTouchTapCell={handleTouchTapCell}
+              longPressThreshold={longPressThreshold}
+              isContextMenuOpen={contextMenuVisible}
+              onContextMenuDismiss={handleContextMenuClose}
+            />
+            <span className='custom-fretboard-label'>BRIDGE</span>
+          </div>
+
+          <div
+            ref={anchorRef}
+            style={{ position: 'fixed', width: 0, height: 0, pointerEvents: 'none' }}
+          />
+
+          <FretpointContextMenu
+            dot={selectedDot}
+            visible={contextMenuVisible}
+            anchorEl={contextMenuAnchorEl}
+            applyToAll={applyToAll}
+            onClose={handleContextMenuClose}
+            onColorChange={handleColorChange}
+            onApplyToAllChange={handleApplyToAllChange}
+            onLabelChange={label => selectedDotId && handleDotLabelChange(selectedDotId, label)}
+            onReset={handleMobileReset}
+            onDelete={handleDeleteSelectedDot}
+          />
+
+          <MobileFretboardMenu
             coords={coords}
-            fretboardConfig={historyConfig}
-            dragState={dragState}
-            selectedDotId={selectedDotId}
-            resolvedPrimaryColor={resolvedPrimaryColor}
-            svgRef={svgRef}
-            onCellClick={handleCellClick}
-            onDotMouseDown={handleDotMouseDown}
-            onSvgMouseMove={handleSvgMouseMove}
-            onSvgMouseUp={handleSvgMouseUp}
-            onBackgroundClick={handleBackgroundClick}
+            historyConfig={historyConfig}
+            presets={presets}
+            onFretCountChange={handleFretCountChange}
+            onStringCountChange={handleStringCountChange}
+            onLoadPreset={handleLoadPreset}
+            onDeletePreset={handleDeletePreset}
+            onSavePreset={handleConfirmSave}
+            savePresetName={savePresetDialog.name}
+            onSavePresetNameChange={name => setSavePresetDialog(prev => ({ ...prev, name }))}
+            overwriteWarning={mobileOverwriteWarning}
+            onExportSvg={handleMobileExport}
+            onClearAll={() => {
+              setSelectedDotId(null);
+              setHistory({ coords: [], fretboardConfig: historyConfig });
+            }}
           />
         </div>
+      )}
 
-        <div className='page-subsection fretboard-controls-panel' ref={controlsRef}>
-          <ControlPanel
-            cardProps={{ header: 'Fretboard Controls' }}
-            elements={controlElements}
-          />
-        </div>
-      </div>
-
-      {/* Save Preset Dialog */}
-      <Dialog
-        header='Save Preset'
-        visible={savePresetDialog.visible}
-        onHide={() => setSavePresetDialog({ visible: false, name: '' })}
-        footer={
-          <div>
-            <Button
-              label='Cancel'
-              severity='secondary'
-              onClick={() => setSavePresetDialog({ visible: false, name: '' })}
-            />
-            <Button
-              label='Save'
-              disabled={!savePresetDialog.name.trim()}
-              onClick={handleConfirmSave}
+      {/* Desktop layout */}
+      {!isMobile && (
+        <div className='custom-fretboard-page-section'>
+          <div className='page-subsection'>
+            <CustomFretboardEditor
+              coords={coords}
+              fretboardConfig={historyConfig}
+              dragState={dragState}
+              selectedDotId={selectedDotId}
+              resolvedPrimaryColor={resolvedPrimaryColor}
+              svgRef={svgRef}
+              onCellClick={handleCellClick}
+              onDotMouseDown={handleDotMouseDown}
+              onSvgMouseMove={handleSvgMouseMove}
+              onSvgMouseUp={handleSvgMouseUp}
+              onBackgroundClick={handleBackgroundClick}
             />
           </div>
-        }
-      >
-        <InputText
-          value={savePresetDialog.name}
-          onChange={e => setSavePresetDialog(prev => ({ ...prev, name: e.target.value }))}
-          placeholder='Preset name'
-          autoFocus
-        />
-        {overwriteWarning && (
-          <p className='custom-fretboard-overwrite-warning'>
-            This will overwrite the existing preset.
+
+          <div className='page-subsection fretboard-controls-panel' ref={controlsRef}>
+            <ControlPanel
+              cardProps={{ header: 'Fretboard Controls' }}
+              elements={controlElements}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Save Preset Dialog — desktop only */}
+      {!isMobile && (
+        <Dialog
+          header='Save Preset'
+          visible={savePresetDialog.visible}
+          onHide={() => setSavePresetDialog({ visible: false, name: '' })}
+          footer={
+            <div>
+              <Button
+                label='Cancel'
+                severity='secondary'
+                onClick={() => setSavePresetDialog({ visible: false, name: '' })}
+              />
+              <Button
+                label='Save'
+                disabled={!savePresetDialog.name.trim()}
+                onClick={() => handleConfirmSave()}
+              />
+            </div>
+          }
+        >
+          <InputText
+            value={savePresetDialog.name}
+            onChange={e => setSavePresetDialog(prev => ({ ...prev, name: e.target.value }))}
+            placeholder='Preset name'
+            autoFocus
+          />
+          {overwriteWarning && (
+            <p className='custom-fretboard-overwrite-warning'>
+              This will overwrite the existing preset.
+            </p>
+          )}
+        </Dialog>
+      )}
+
+      {/* Export SVG Dialog — desktop only */}
+      {!isMobile && (
+        <Dialog
+          header='Export SVG'
+          visible={exportDialog.visible}
+          onHide={() => setExportDialog({ visible: false, fileName: 'fretboard' })}
+          footer={
+            <div>
+              <Button
+                label='Cancel'
+                severity='secondary'
+                onClick={() => setExportDialog({ visible: false, fileName: 'fretboard' })}
+              />
+              <Button label='Export' onClick={() => exportSvg(exportDialog.fileName)} />
+            </div>
+          }
+        >
+          <InputText
+            value={exportDialog.fileName}
+            onChange={e => setExportDialog(prev => ({ ...prev, fileName: e.target.value }))}
+            placeholder='File name'
+            autoFocus
+          />
+          <p className='custom-fretboard-export-hint'>
+            Will be saved as <strong>{exportDialog.fileName || 'fretboard'}.svg</strong>
           </p>
-        )}
-      </Dialog>
-
-      {/* Export SVG Dialog */}
-      <Dialog
-        header='Export SVG'
-        visible={exportDialog.visible}
-        onHide={() => setExportDialog({ visible: false, fileName: 'fretboard' })}
-        footer={
-          <div>
-            <Button
-              label='Cancel'
-              severity='secondary'
-              onClick={() => setExportDialog({ visible: false, fileName: 'fretboard' })}
-            />
-            <Button label='Export' onClick={() => exportSvg(exportDialog.fileName)} />
-          </div>
-        }
-      >
-        <InputText
-          value={exportDialog.fileName}
-          onChange={e => setExportDialog(prev => ({ ...prev, fileName: e.target.value }))}
-          placeholder='File name'
-          autoFocus
-        />
-        <p className='custom-fretboard-export-hint'>
-          Will be saved as <strong>{exportDialog.fileName || 'fretboard'}.svg</strong>
-        </p>
-      </Dialog>
+        </Dialog>
+      )}
     </div>
   );
 };

@@ -16,7 +16,7 @@ function App() {
         <Route path="scales" element={<Scales />} />
         <Route path="intervals" element={<Intervals />} />
         <Route path="metronome" element={<MetronomePage />} />
-        <Route path="teaching-tools" element={<Outlet />}>
+        <Route path="tools" element={<Outlet />}>
           <Route path="fretboard" element={<CustomFretboard />} />
         </Route>
       </Route>

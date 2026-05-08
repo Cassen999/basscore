@@ -142,6 +142,46 @@ export interface iControlsContext {
   setScaleNoteColor: Dispatch<SetStateAction<tColorType>>
   fretboardConfig: iFretboardConfig;
   setFretboardConfig: Dispatch<SetStateAction<iFretboardConfig>>;
+  /** @default 1000 */
+  longPressThreshold: number;
+  setLongPressThreshold: Dispatch<SetStateAction<number>>;
+}
+
+export interface iAppSidebarProps {
+  visible: boolean;
+  onHide: () => void;
+  /** @default 'right' */
+  position?: 'left' | 'right' | 'top' | 'bottom';
+  children: ReactNode;
+}
+
+export interface iFretpointContextMenuProps {
+  dot: iCoords | null;
+  visible: boolean;
+  anchorEl: HTMLElement | null;
+  applyToAll: boolean;
+  onClose: () => void;
+  onColorChange: (color: string) => void;
+  onApplyToAllChange: (val: boolean) => void;
+  onLabelChange: (val: string) => void;
+  onReset: () => void;
+  onDelete: () => void;
+}
+
+export interface iMobileFretboardMenuProps {
+  coords: iCoords[];
+  historyConfig: iFretboardConfig;
+  presets: iCustomFretboardPreset[];
+  onFretCountChange: (n: number) => void;
+  onStringCountChange: (n: number) => void;
+  onLoadPreset: (id: string) => void;
+  onDeletePreset: (id: string) => void;
+  onSavePreset: (name: string) => void;
+  savePresetName: string;
+  onSavePresetNameChange: (name: string) => void;
+  overwriteWarning: boolean;
+  onExportSvg: () => void;
+  onClearAll: () => void;
 }
 
 export interface iControlElementGroups {
