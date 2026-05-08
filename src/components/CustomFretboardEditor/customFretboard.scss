@@ -102,6 +102,152 @@
   margin-top: 0.5rem;
 }
 
+// Mobile page section
+.custom-fretboard-page-section--mobile {
+  flex-direction: column;
+  align-items: center;
+}
+
+// Wrapper holding nut/bridge labels + rotated editor
+.custom-fretboard-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Nut / Bridge text labels
+.custom-fretboard-label {
+  font-size: 0.75rem;
+  color: $secondary-text;
+  padding: 0.25rem 0;
+}
+
+// Rotated SVG class hook
+.custom-fretboard-editor--rotated {
+  // Axis swap is done at render time — no CSS transform needed.
+}
+
+// Fretpoint context menu
+.fretpoint-context-menu {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  &__color-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__apply-all {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+}
+
+// Cog FAB — fixed top-right of viewport
+.mobile-fretboard-cog-fab {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+
+  .p-button-icon {
+    color: var(--primary-color);
+  }
+}
+
+// Accordion rows and slide-down bodies
+.mobile-fretboard-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__dropdown {
+    width: 100%;
+  }
+
+  &__preset-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__save-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  &__save-input-area {
+    margin-top: 0.5rem;
+
+    .p-inputtext {
+      background: map.get($colors, 'gray650');
+      color: $primary-text;
+      margin: 3px;
+      width: calc(100% - 6px);
+
+      &::placeholder {
+        color: $secondary-text;
+      }
+    }
+  }
+
+  &__accordion-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.75rem 0;
+  }
+
+  &__caret {
+    transition: transform 0.2s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__accordion-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease;
+
+    &--open {
+      max-height: 600px;
+      padding-left: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+  }
+}
+
 @media (max-width: #{map.get($breakpoints, 'md')}) {
   .custom-fretboard-page-section {
     flex-direction: column;

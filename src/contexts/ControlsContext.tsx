@@ -36,6 +36,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
     numStrings: 4,
     fretpointRadius: 8,
   });
+  const [longPressThreshold, setLongPressThreshold] = useState<number>(1000);
 
   const intervalColors: iIntervalColors = useMemo(() => ({
     root: {
@@ -65,6 +66,8 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       setScaleNoteColor: setScaleNoteColor,
       fretboardConfig: fretboardConfig,
       setFretboardConfig: setFretboardConfig,
+      longPressThreshold: longPressThreshold,
+      setLongPressThreshold: setLongPressThreshold,
     }),
     [
       interval,
@@ -73,6 +76,7 @@ export const ControlsProvider = ({ children }: { children: ReactNode }) => {
       displayedScales,
       scaleNoteColor,
       fretboardConfig,
+      longPressThreshold,
     ],
   );
 

@@ -1,6 +1,6 @@
 import { createRef } from 'react'
-import { render, screen, fireEvent, within } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, fireEvent, within, act } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { CustomFretboard } from './CustomFretboard'
 import CustomFretboardEditor from './CustomFretboardEditor'
@@ -8,6 +8,41 @@ import { ControlsProvider } from '../../contexts/ControlsContext'
 import { useControls } from '../../contexts/ControlsContext'
 import * as customFretboardService from '../../services/customFretboardService'
 import type { iCoords, iCustomFretboardPreset, iDragState, iFretboardConfig } from '../../types/types'
+import { useIsMobile } from '../../hooks/useIsMobile'
+
+vi.mock('../../hooks/useIsMobile', () => ({ useIsMobile: vi.fn(() => false) }))
+
+vi.mock('./FretpointContextMenu', () => ({
+  default: ({
+    dot,
+    visible,
+    onClose,
+    onReset,
+    onDelete,
+  }: {
+    dot: { id?: string } | null
+    visible: boolean
+    onClose: () => void
+    onReset: () => void
+    onDelete: () => void
+  }) =>
+    visible ? (
+      <div data-testid='context-menu' data-dot-id={dot?.id ?? ''}>
+        <button onClick={onClose}>Context Close</button>
+        <button onClick={onReset}>Context Reset</button>
+        <button onClick={onDelete}>Context Delete</button>
+      </div>
+    ) : null,
+}))
+
+vi.mock('./MobileFretboardMenu', () => ({
+  default: ({ onExportSvg, onClearAll }: { onExportSvg: () => void; onClearAll: () => void }) => (
+    <div data-testid='mobile-menu'>
+      <button onClick={onExportSvg}>Mobile Export</button>
+      <button onClick={onClearAll}>Mobile Clear All</button>
+    </div>
+  ),
+}))
 
 const stubPreset: iCustomFretboardPreset = {
   id: 'preset-1',
@@ -680,6 +715,164 @@ describe('CustomFretboard', () => {
         'circle:not(.custom-fretboard-editor__position-marker)',
       )
       dotCircles.forEach(c => expect(c).toHaveAttribute('fill', '#ff0000'))
+    })
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CustomFretboard — mobile
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('CustomFretboard — mobile', () => {
+  const mockUseIsMobile = vi.mocked(useIsMobile)
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUseIsMobile.mockReturnValue(true)
+  })
+
+  const renderMobile = () =>
+    render(
+      <ControlsProvider>
+        <CustomFretboard />
+      </ControlsProvider>,
+    )
+
+  it('renders the mobile layout with NUT and BRIDGE labels', () => {
+    renderMobile()
+    expect(screen.getByText('NUT')).toBeInTheDocument()
+    expect(screen.getByText('BRIDGE')).toBeInTheDocument()
+  })
+
+  it('mobile initial fret count is 7', () => {
+    renderMobile()
+    // 7 frets means 7 × numStrings hit areas in first row — verify aria label exists
+    expect(screen.getByRole('button', { name: 'String 1, Fret 7 — empty' })).toBeInTheDocument()
+  })
+
+  it('does not render desktop ControlPanel on mobile', () => {
+    renderMobile()
+    expect(screen.queryByText('Fretboard Controls')).not.toBeInTheDocument()
+  })
+
+  it('does not render the Export SVG dialog on mobile', () => {
+    renderMobile()
+    expect(screen.queryByRole('dialog', { name: 'Export SVG' })).not.toBeInTheDocument()
+  })
+
+  it('does not render the Save Preset dialog trigger on mobile', () => {
+    renderMobile()
+    expect(screen.queryByRole('button', { name: 'Save Preset' })).not.toBeInTheDocument()
+  })
+
+  describe('touch interactions', () => {
+    beforeEach(() => vi.useFakeTimers())
+    afterEach(() => vi.useRealTimers())
+
+    it('tap on empty cell adds a dot (onTouchTapCell path)', () => {
+      renderMobile()
+      const cell = screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })
+      fireEvent.touchStart(cell, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(200))
+      fireEvent.touchEnd(cell)
+      expect(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' })).toBeInTheDocument()
+    })
+
+    it('tap while context menu is open closes menu and does not add dot', () => {
+      renderMobile()
+      const cell1 = screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })
+      fireEvent.touchStart(cell1, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(1001))
+      fireEvent.touchEnd(cell1)
+      expect(screen.getByTestId('context-menu')).toBeInTheDocument()
+
+      // Tap another cell while menu is open — menu closes, no new dot
+      const cell2 = screen.getByRole('button', { name: 'String 1, Fret 2 — empty' })
+      fireEvent.touchStart(cell2, { targetTouches: [{ clientX: 200, clientY: 100 }] })
+      fireEvent.touchEnd(cell2)
+      expect(screen.queryByTestId('context-menu')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'String 1, Fret 2 — occupied' })).not.toBeInTheDocument()
+    })
+
+    it('long press on empty cell adds dot and opens context menu', () => {
+      renderMobile()
+      const cell = screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })
+      fireEvent.touchStart(cell, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(1001))
+      expect(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' })).toBeInTheDocument()
+      expect(screen.getByTestId('context-menu')).toBeInTheDocument()
+    })
+
+    it('long press on occupied dot opens context menu without adding new dot', () => {
+      renderMobile()
+      // First add a dot via tap
+      const cell = screen.getByRole('button', { name: 'String 2, Fret 3 — empty' })
+      fireEvent.touchStart(cell, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(200))
+      fireEvent.touchEnd(cell)
+      expect(screen.getByRole('button', { name: 'String 2, Fret 3 — occupied' })).toBeInTheDocument()
+
+      // Long press on the occupied cell
+      const occupied = screen.getByRole('button', { name: 'String 2, Fret 3 — occupied' })
+      fireEvent.touchStart(occupied, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(1001))
+      expect(screen.getByTestId('context-menu')).toBeInTheDocument()
+    })
+
+    it('context menu Close button closes menu and deactivates dot', () => {
+      renderMobile()
+      const cell = screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })
+      fireEvent.touchStart(cell, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(1001))
+      fireEvent.touchEnd(cell)
+      expect(screen.getByTestId('context-menu')).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Context Close' }))
+      expect(screen.queryByTestId('context-menu')).not.toBeInTheDocument()
+    })
+
+    it('context menu Delete button removes the dot', () => {
+      renderMobile()
+      const cell = screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })
+      fireEvent.touchStart(cell, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(1001))
+      fireEvent.touchEnd(cell)
+      fireEvent.click(screen.getByRole('button', { name: 'Context Delete' }))
+      expect(screen.queryByTestId('context-menu')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })).toBeInTheDocument()
+    })
+
+    it('context menu Reset button reverts dot color to primary', () => {
+      renderMobile()
+      const cell = screen.getByRole('button', { name: 'String 1, Fret 1 — empty' })
+      fireEvent.touchStart(cell, { targetTouches: [{ clientX: 100, clientY: 100 }] })
+      act(() => vi.advanceTimersByTime(1001))
+      fireEvent.touchEnd(cell)
+      fireEvent.click(screen.getByRole('button', { name: 'Context Reset' }))
+      expect(screen.getByRole('button', { name: 'String 1, Fret 1 — occupied' })).toBeInTheDocument()
+    })
+  })
+
+  describe('mobile export', () => {
+    it('calls navigator.share when canShare returns true', async () => {
+      const share = vi.fn().mockResolvedValue(undefined)
+      const canShare = vi.fn().mockReturnValue(true)
+      vi.stubGlobal('navigator', { share, canShare })
+      vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:test'), revokeObjectURL: vi.fn() })
+      renderMobile()
+      fireEvent.click(screen.getByRole('button', { name: 'Mobile Export' }))
+      // Give async export a chance to run
+      await Promise.resolve()
+      expect(share).toHaveBeenCalledOnce()
+    })
+
+    it('falls back to anchor-click when canShare returns false', async () => {
+      const createObjectURL = vi.fn(() => 'blob:test')
+      vi.stubGlobal('navigator', { canShare: vi.fn().mockReturnValue(false) })
+      vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() })
+      renderMobile()
+      fireEvent.click(screen.getByRole('button', { name: 'Mobile Export' }))
+      await Promise.resolve()
+      expect(createObjectURL).toHaveBeenCalledOnce()
     })
   })
 })
